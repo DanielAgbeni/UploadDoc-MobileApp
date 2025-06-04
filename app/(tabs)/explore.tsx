@@ -1,12 +1,12 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-const submit = () => {
+const explore = () => {
 	return (
 		<View>
-			<Text>submit</Text>
+			<Text>explore</Text>
 		</View>
 	);
 };
 
-export default submit;
+export default explore;
