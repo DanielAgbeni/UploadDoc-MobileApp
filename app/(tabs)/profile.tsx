@@ -1,7 +1,9 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
 	Alert,
 	Image,
+	Linking,
 	ScrollView,
 	Text,
 	TouchableOpacity,
@@ -12,27 +14,23 @@ import { AuthButton } from '../components/auth/AuthButton';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../hooks/useTheme';
 
-const profile = () => {
+const Profile = () => {
 	const { themed } = useTheme();
 	const { user, logout } = useAuth();
+	const router = useRouter();
 	console.log('User', user);
 
 	const handleLogout = () => {
 		Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-			{
-				text: 'Cancel',
-				style: 'cancel',
-			},
+			{ text: 'Cancel', style: 'cancel' },
 			{
 				text: 'Sign Out',
 				style: 'destructive',
 				onPress: async () => {
 					try {
-						console.log('User initiated logout');
 						await logout();
-						console.log('Logout successful, user should be redirected to auth');
+						router.replace('/auth/login');
 					} catch (error) {
-						console.error('Logout failed:', error);
 						Alert.alert(
 							'Logout Error',
 							'Failed to sign out. Please try again.',
@@ -45,25 +43,23 @@ const profile = () => {
 
 	const ProfileCard = ({ title, value, icon }: any) => (
 		<View
-			className={`${themed.bg.background} rounded-xl p-5 mb-4 shadow-sm border ${themed.border.primary}`}>
-			<View className='flex-row items-center mb-2'>
-				{icon && <Text className='text-lg mr-2'>{icon}</Text>}
-				<Text
-					className={`text-sm font-semibold ${themed.text.secondary} uppercase tracking-wide`}>
+			className={`${themed.bg.background} border ${themed.border.primary} rounded-2xl p-5 mb-4 shadow-sm`}>
+			<View className='flex-row items-center mb-1'>
+				<Text className='text-lg mr-2'>{icon}</Text>
+				<Text className={`text-xs uppercase font-semibold ${themed.text.text}`}>
 					{title}
 				</Text>
 			</View>
-			<Text
-				className={`text-base font-medium ${themed.text.primary} leading-relaxed`}>
+			<Text className={`text-base font-medium ${themed.text.text}`}>
 				{value || 'Not provided'}
 			</Text>
 		</View>
 	);
 
 	const getAccountTypeColor = () => {
-		if (user?.superAdmin) return 'bg-purple-500';
-		if (user?.isAdmin) return 'bg-blue-500';
-		return 'bg-green-500';
+		if (user?.superAdmin) return 'bg-purple-600';
+		if (user?.isAdmin) return 'bg-blue-600';
+		return 'bg-emerald-600';
 	};
 
 	const getAccountTypeText = () => {
@@ -76,32 +72,26 @@ const profile = () => {
 		<ScrollView
 			className={`flex-1 ${themed.bg.background}`}
 			showsVerticalScrollIndicator={false}>
-			{/* Header Section with Gradient Background */}
-			<View className={`${themed.bg.primary} pt-16 pb-8 px-6 rounded-b-3xl`}>
+			{/* Header */}
+			<View className={`${themed.bg.primary} pt-16 pb-10 px-6 rounded-b-3xl`}>
 				<View className='items-center'>
-					{/* Profile Avatar */}
 					<View className='relative mb-4'>
-						<View className='w-28 h-28 rounded-full bg-white/20 backdrop-blur-sm items-center justify-center border-4 border-white/30'>
-							<Text className='text-white text-7xl font-bold'>
+						<View className='w-28 h-28 rounded-full bg-white/10 border-4 border-white/30 items-center justify-center'>
+							<Text className='text-white text-6xl font-bold'>
 								{user?.name?.charAt(0).toUpperCase() || 'U'}
 							</Text>
 						</View>
-						{/* Online Status Indicator */}
-						<View className='absolute bottom-2 right-2 w-6 h-6 bg-green-400 rounded-full border-3 border-white' />
+						<View className='absolute bottom-2 right-2 w-5 h-5 bg-green-400 rounded-full border-2 border-white' />
 					</View>
 
-					{/* User Name and Email */}
 					<Text className='text-white text-2xl font-bold mb-1'>
 						{user?.name || 'User'}
 					</Text>
-					<Text className='text-white/80 text-base font-medium'>
-						{user?.email}
-					</Text>
+					<Text className='text-white/80'>{user?.email}</Text>
 
-					{/* Account Type Badge */}
 					<View
-						className={`mt-4 px-4 py-2 rounded-full ${getAccountTypeColor()} flex-row items-center`}>
-						<View className='w-2 h-2 rounded-full bg-white mr-2' />
+						className={`mt-4 px-4 py-1 rounded-full ${getAccountTypeColor()} flex-row items-center`}>
+						<View className='w-2 h-2 bg-white rounded-full mr-2' />
 						<Text className='text-white text-sm font-semibold'>
 							{getAccountTypeText()}
 						</Text>
@@ -109,11 +99,10 @@ const profile = () => {
 				</View>
 			</View>
 
-			{/* Content Section */}
-			<View className='px-6 py-6 -mt-4'>
-				{/* Profile Information */}
+			{/* Body */}
+			<View className='px-6 pt-6 -mt-4'>
 				<Text className={`text-xl font-bold ${themed.text.primary} mb-4`}>
-					Profile Information
+					Account Details
 				</Text>
 
 				<ProfileCard
@@ -121,74 +110,127 @@ const profile = () => {
 					value={user?.name}
 					icon='👤'
 				/>
-
 				<ProfileCard
 					title='Email Address'
 					value={user?.email}
 					icon='📧'
 				/>
-
 				<ProfileCard
 					title='Matric Number'
 					value={user?.matricNumber}
 					icon='🎓'
 				/>
 
-				{/* Document Token with Copy Action */}
+				{/* Provider-specific information */}
+				{(user?.isAdmin || user?.superAdmin) && (
+					<>
+						<Text
+							className={`text-xl font-bold ${themed.text.primary} mb-4 mt-6`}>
+							Provider Details
+						</Text>
+
+						<ProfileCard
+							title='Printing Cost'
+							value={user?.printingCost}
+							icon='💰'
+						/>
+						<ProfileCard
+							title='Printing Location'
+							value={user?.printingLocation}
+							icon='📍'
+						/>
+						<ProfileCard
+							title='Opening Hours'
+							value={user?.openingHours}
+							icon='🕒'
+						/>
+						<ProfileCard
+							title='Support Contact'
+							value={user?.supportContact}
+							icon='📞'
+						/>
+						{user?.additionalInfo && (
+							<ProfileCard
+								title='Additional Information'
+								value={user?.additionalInfo}
+								icon='ℹ️'
+							/>
+						)}
+
+						{/* Discount Rates */}
+						{user?.discountRates && user.discountRates.length > 0 && (
+							<View
+								className={`${themed.bg.background} border ${themed.border.primary} rounded-2xl p-5 mb-4 shadow-sm`}>
+								<View className='flex-row items-center mb-3'>
+									<Text className='text-lg mr-2'>🏷️</Text>
+									<Text
+										className={`text-xs uppercase font-semibold ${themed.text.text}`}>
+										Discount Rates
+									</Text>
+								</View>
+								{user.discountRates.map((discount, index) => (
+									<Text
+										key={index}
+										className={`text-sm ${themed.text.text} mb-1`}>
+										{discount.minPages}-{discount.maxPages} pages:{' '}
+										{discount.discount}% off
+									</Text>
+								))}
+							</View>
+						)}
+					</>
+				)}
+
+				{/* Document Token */}
 				<View
-					className={`${themed.bg.background} rounded-xl p-5 mb-6 shadow-sm border ${themed.border.primary}`}>
-					<View className='flex-row items-center justify-between mb-2'>
-						<View className='flex-row items-center'>
-							<Text className='text-lg mr-2'>🔑</Text>
-							<Text
-								className={`text-sm font-semibold ${themed.text.secondary} uppercase tracking-wide`}>
-								Document Token
-							</Text>
-						</View>
+					className={`${themed.bg.background} border ${themed.border.primary} rounded-2xl p-5 mb-6 shadow-sm`}>
+					<View className='flex-row items-center mb-2'>
+						<Text className='text-lg mr-2'>🔑</Text>
+						<Text
+							className={`text-xs uppercase font-semibold tracking-wide ${themed.text.text}`}>
+							Document Token
+						</Text>
 					</View>
-					<Text
-						className={`text-sm ${themed.text.primary} font-mono p-3 rounded-lg`}>
+					<Text className={`text-sm font-mono ${themed.text.text}`}>
 						{user?.documentToken || 'Not assigned'}
 					</Text>
 				</View>
 
-				{/* Action Buttons */}
-				<View className='mb-8'>
-					<TouchableOpacity
-						className={`${themed.bg.background} rounded-xl p-4 mb-4 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
-						<View className='flex-row items-center'>
-							<Text className='text-lg mr-3'>✏️</Text>
-							<Text className={`text-base font-medium ${themed.text.primary}`}>
-								Edit Profile
-							</Text>
-						</View>
-						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						className={`${themed.bg.background} rounded-xl p-4 mb-4 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
-						<View className='flex-row items-center'>
-							<Text className='text-lg mr-3'>🔒</Text>
-							<Text className={`text-base font-medium ${themed.text.primary}`}>
-								Privacy Settings
-							</Text>
-						</View>
-						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						className={`${themed.bg.background} rounded-xl p-4 mb-6 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
-						<View className='flex-row items-center'>
-							<Text className='text-lg mr-3'>❓</Text>
-							<Text className={`text-base font-medium ${themed.text.primary}`}>
-								Help & Support
-							</Text>
-						</View>
-						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
-					</TouchableOpacity>
+				{/* Action Items */}
+				<View className='gap-4 mb-8'>
+					{[
+						...(user?.isAdmin || user?.superAdmin
+							? [
+									{
+										label: 'Edit Provider Profile',
+										icon: '✏️',
+										onPress: () => router.push('/screens/EditProfile' as any),
+									},
+							  ]
+							: []),
+						{
+							label: 'Privacy Policy',
+							icon: '🔒',
+							onPress: () =>
+								Linking.openURL('https://uploaddoc.vercel.app/privacy-policy'),
+						},
+						// { label: 'Help & Support', icon: '❓', onPress: () => {} },
+					].map((item, index) => (
+						<TouchableOpacity
+							key={index}
+							onPress={item.onPress}
+							className={`${themed.bg.background} border ${themed.border.primary} flex-row items-center justify-between p-4 rounded-xl`}>
+							<View className='flex-row items-center'>
+								<Text className='text-lg mr-3'>{item.icon}</Text>
+								<Text className={`text-base font-medium ${themed.text.text}`}>
+									{item.label}
+								</Text>
+							</View>
+							<Text className={`text-xl ${themed.text.text}`}>›</Text>
+						</TouchableOpacity>
+					))}
 				</View>
 
-				{/* Logout Button */}
 				<AuthButton
 					title='Sign Out'
 					onPress={handleLogout}
@@ -196,9 +238,9 @@ const profile = () => {
 					size='large'
 				/>
 
-				{/* App Info */}
-				<View className='items-center mt-8 pt-6'>
-					<View className='flex-row items-center mb-3'>
+				{/* Footer */}
+				<View className='items-center mt-10'>
+					<View className='flex-row items-center mb-2'>
 						<Image
 							source={icons.logo}
 							className='w-6 h-6 mr-2 rounded'
@@ -208,7 +250,8 @@ const profile = () => {
 							UploadDoc
 						</Text>
 					</View>
-					<Text className={`text- font-semibold ${themed.text.secondary}`}>
+					<Text
+						className={`text-xs mb-4 font-semibold ${themed.text.secondary}`}>
 						Version 1.0.2
 					</Text>
 				</View>
@@ -217,4 +260,4 @@ const profile = () => {
 	);
 };
 
-export default profile;
+export default Profile;

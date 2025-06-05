@@ -1,56 +1,91 @@
 export interface User {
-  id: string;
-  name: string;
-  email: string;
-  matricNumber?: string;
-  isAdmin: boolean;
-  superAdmin: boolean;
-  documentToken: string;
-  documentsReceived?: number;
-  isVerified: boolean;
+	id: string;
+	name: string;
+	email: string;
+	matricNumber?: string;
+	isAdmin: boolean;
+	superAdmin: boolean;
+	documentToken: string;
+	documentsReceived?: number;
+	isVerified: boolean;
+	// Provider-specific fields
+	openingHours?: string;
+	printingCost?: string;
+	printingLocation?: string;
+	discountRates?: DiscountRate[];
+	supportContact?: string;
+	additionalInfo?: string;
+	rating?: number;
+	reviews?: Review[];
+	adminStatus?: string;
+	queueTimeEstimate?: number;
+}
+
+export interface DiscountRate {
+	minPages: number;
+	maxPages: number;
+	discount: number;
+}
+
+export interface Review {
+	id: string;
+	rating: number;
+	comment: string;
+	createdAt: string;
+	userId: string;
+	userName: string;
 }
 
 export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
+	user: User | null;
+	token: string | null;
+	isLoading: boolean;
+	isAuthenticated: boolean;
 }
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+	email: string;
+	password: string;
 }
 
 export interface RegisterRequest {
-  name: string;
-  email: string;
-  matricNumber: string;
-  password: string;
+	name: string;
+	email: string;
+	matricNumber: string;
+	password: string;
 }
 
 export interface VerifyEmailRequest {
-  email: string;
-  otp: string;
+	email: string;
+	otp: string;
 }
 
 export interface AuthResponse {
-  token: string;
-  user: User;
-  message?: string;
+	token: string;
+	user: User;
+	message?: string;
 }
 
 export interface ApiError {
-  message: string;
-  needsVerification?: boolean;
-  needsRegistration?: boolean;
-  canResend?: boolean;
-  email?: string;
-  attemptsRemaining?: number;
+	message: string;
+	needsVerification?: boolean;
+	needsRegistration?: boolean;
+	canResend?: boolean;
+	email?: string;
+	attemptsRemaining?: number;
 }
 
 export interface GoogleAuthResult {
-  type: 'success' | 'cancel';
-  token?: string;
-  user?: User;
+	type: 'success' | 'cancel';
+	token?: string;
+	user?: User;
+}
+
+export interface UpdateProfileRequest {
+	openingHours?: string;
+	printingCost?: string;
+	printingLocation?: string;
+	discountRates?: DiscountRate[];
+	supportContact?: string;
+	additionalInfo?: string;
 }
