@@ -111,6 +111,21 @@ export default function LoginScreen() {
 		Alert.alert('Google Sign-in Failed', errorMessage);
 	};
 
+	// const handleTestConnection = async () => {
+	// 	try {
+	// 		const result = await testBackendConnection();
+	// 		Alert.alert(
+	// 			result.success
+	// 				? 'Connection Test Successful'
+	// 				: 'Connection Test Failed',
+	// 			result.message,
+	// 			[{ text: 'OK' }],
+	// 		);
+	// 	} catch (error) {
+	// 		Alert.alert('Connection Test Error', 'Failed to test connection');
+	// 	}
+	// };
+
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -124,13 +139,15 @@ export default function LoginScreen() {
 					<View className='items-center mb-8 mt-12'>
 						<Image
 							source={icons.logo}
-							className='w-20 h-20 mb-4'
+							className='w-20 h-20 mb-4 rounded-lg'
 							resizeMode='contain'
 						/>
-						<Text className={`text-3xl font-bold mb-2 ${themed.text.primary}`}>
+						<Text
+							className={`text-3xl font-extrabold mb-2 ${themed.text.primary}`}>
 							Welcome Back
 						</Text>
-						<Text className={`text-base text-center ${themed.text.secondary}`}>
+						<Text
+							className={`text-xl font-bold text-center ${themed.text.text}`}>
 							Sign in to your UploadDoc account
 						</Text>
 					</View>
@@ -201,7 +218,8 @@ export default function LoginScreen() {
 					{/* Divider */}
 					<View className='flex-row items-center mb-6'>
 						<View className={`flex-1 h-px ${themed.bg.secondary}`} />
-						<Text className={`mx-4 text-sm ${themed.text.secondary}`}>
+						<Text
+							className={`mx-4 font-medium text-base ${themed.text.accent}`}>
 							or continue with
 						</Text>
 						<View className={`flex-1 h-px ${themed.bg.secondary}`} />
@@ -213,16 +231,30 @@ export default function LoginScreen() {
 						onError={handleGoogleError}
 					/>
 
+					{/* Debug: Test Connection Button (Development Only)
+					{__DEV__ && (
+						<View className='mb-4'>
+							<TouchableOpacity
+								onPress={handleTestConnection}
+								className={`p-3 rounded-lg border border-gray-300 dark:border-gray-600 ${themed.bg.background}`}>
+								<Text
+									className={`text-center text-sm ${themed.text.secondary}`}>
+									🔧 Test Backend Connection
+								</Text>
+							</TouchableOpacity>
+						</View>
+					)} */}
+
 					{/* Footer Links */}
 					<View className='mt-8 items-center'>
 						<TouchableOpacity className='mb-4'>
-							<Text className='text-primary text-base font-medium'>
+							<Text className={`${themed.text.text} text-base font-medium`}>
 								Forgot Password?
 							</Text>
 						</TouchableOpacity>
 
 						<View className='flex-row items-center'>
-							<Text className={`text-base ${themed.text.secondary}`}>
+							<Text className={`text-base ${themed.text.text}`}>
 								Don't have an account?{' '}
 							</Text>
 							<Link
@@ -230,7 +262,7 @@ export default function LoginScreen() {
 								asChild>
 								<TouchableOpacity>
 									<Text
-										className={`${themed.text.accent} underline text-base font-medium`}>
+										className={`${themed.text.primary} underline text-base font-medium`}>
 										Sign Up
 									</Text>
 								</TouchableOpacity>

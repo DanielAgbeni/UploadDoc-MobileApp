@@ -15,6 +15,7 @@ import { useTheme } from '../hooks/useTheme';
 const profile = () => {
 	const { themed } = useTheme();
 	const { user, logout } = useAuth();
+	console.log('User', user);
 
 	const handleLogout = () => {
 		Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -26,7 +27,17 @@ const profile = () => {
 				text: 'Sign Out',
 				style: 'destructive',
 				onPress: async () => {
-					await logout();
+					try {
+						console.log('User initiated logout');
+						await logout();
+						console.log('Logout successful, user should be redirected to auth');
+					} catch (error) {
+						console.error('Logout failed:', error);
+						Alert.alert(
+							'Logout Error',
+							'Failed to sign out. Please try again.',
+						);
+					}
 				},
 			},
 		]);
@@ -53,6 +64,31 @@ const profile = () => {
 
 				{/* User Info Cards */}
 				<View className='mb-8'>
+					{/* Full Name */}
+					<View
+						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
+						<Text
+							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
+							Full Name
+						</Text>
+						<Text className={`text-base ${themed.text.primary}`}>
+							{user?.name || 'Not provided'}
+						</Text>
+					</View>
+
+					{/* Email */}
+					<View
+						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
+						<Text
+							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
+							Email Address
+						</Text>
+						<Text className={`text-base ${themed.text.primary}`}>
+							{user?.email || 'Not provided'}
+						</Text>
+					</View>
+
+					{/* Matric Number */}
 					<View
 						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
 						<Text
@@ -64,18 +100,56 @@ const profile = () => {
 						</Text>
 					</View>
 
+					{/* User ID */}
+					<View
+						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
+						<Text
+							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
+							User ID
+						</Text>
+						<Text
+							className={`text-base ${themed.text.primary} font-mono text-xs`}>
+							{user?.id || 'Not available'}
+						</Text>
+					</View>
+
+					{/* Account Type */}
 					<View
 						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
 						<Text
 							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
 							Account Type
 						</Text>
-						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.isAdmin ? 'Administrator' : 'Student'}
-							{user?.superAdmin && ' (Super Admin)'}
+						<View className='flex-row items-center'>
+							<View
+								className={`w-2 h-2 rounded-full mr-2 ${
+									user?.isAdmin ? 'bg-blue-500' : 'bg-green-500'
+								}`}
+							/>
+							<Text className={`text-base ${themed.text.primary}`}>
+								{user?.superAdmin
+									? 'Super Administrator'
+									: user?.isAdmin
+									? 'Administrator'
+									: 'Student'}
+							</Text>
+						</View>
+					</View>
+
+					{/* Document Token */}
+					<View
+						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
+						<Text
+							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
+							Document Token
+						</Text>
+						<Text
+							className={`text-base ${themed.text.primary} font-mono text-xs`}>
+							{user?.documentToken || 'Not assigned'}
 						</Text>
 					</View>
 
+					{/* Documents Received */}
 					<View
 						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
 						<Text
@@ -83,10 +157,13 @@ const profile = () => {
 							Documents Received
 						</Text>
 						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.documentsReceived || 0}
+							{user?.documentsReceived !== undefined
+								? user.documentsReceived
+								: 0}
 						</Text>
 					</View>
 
+					{/* Verification Status */}
 					<View
 						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
 						<Text
@@ -129,6 +206,24 @@ const profile = () => {
 						</Text>
 					</TouchableOpacity>
 				</View>
+
+				{/* Debug Info (Development Only) */}
+				{__DEV__ && (
+					<View className='mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800'>
+						<Text className={`text-sm font-medium mb-2 ${themed.text.primary}`}>
+							🔧 Debug Info
+						</Text>
+						<Text className={`text-xs ${themed.text.secondary} mb-1`}>
+							User authenticated: {user ? 'Yes' : 'No'}
+						</Text>
+						<Text className={`text-xs ${themed.text.secondary} mb-1`}>
+							User ID: {user?.id || 'None'}
+						</Text>
+						<Text className={`text-xs ${themed.text.secondary}`}>
+							Check console for logout logs
+						</Text>
+					</View>
+				)}
 
 				{/* Logout Button */}
 				<AuthButton

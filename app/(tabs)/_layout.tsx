@@ -6,6 +6,7 @@ import Animated, {
 	useAnimatedStyle,
 	withTiming,
 } from 'react-native-reanimated';
+import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../hooks/useTheme';
 
 const TabIcon = ({ focused, icons, title }: any) => {
@@ -42,6 +43,7 @@ const TabIcon = ({ focused, icons, title }: any) => {
 
 const _layout = () => {
 	const { colors } = useTheme();
+	const { user } = useAuth();
 
 	return (
 		<Tabs
@@ -105,13 +107,13 @@ const _layout = () => {
 			<Tabs.Screen
 				name='profile'
 				options={{
-					title: 'Profile',
+					title: user?.name?.split(' ')[0] || 'Profile',
 					headerShown: false,
 					tabBarIcon: ({ focused }) => (
 						<TabIcon
 							focused={focused}
 							icons={icons.profileIcon}
-							title='Profile'
+							title={user?.name?.split(' ')[0] || 'Profile'}
 						/>
 					),
 				}}

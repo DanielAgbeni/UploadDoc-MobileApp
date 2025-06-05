@@ -31,12 +31,13 @@ export const useTheme = () => {
 		},
 		// Text colors
 		text: {
-			primary: getThemedClassName('text-light-text', 'text-dark-text'),
+			primary: getThemedClassName('text-light-primary', 'text-dark-primary'),
 			secondary: getThemedClassName(
 				'text-light-secondary',
 				'text-dark-secondary',
 			),
 			accent: getThemedClassName('text-light-accent', 'text-dark-accent'),
+			text: getThemedClassName('text-light-text', 'text-dark-text'),
 		},
 		// Border colors
 		border: {
