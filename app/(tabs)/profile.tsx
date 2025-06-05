@@ -43,205 +43,173 @@ const profile = () => {
 		]);
 	};
 
+	const ProfileCard = ({ title, value, icon }: any) => (
+		<View
+			className={`${themed.bg.background} rounded-xl p-5 mb-4 shadow-sm border ${themed.border.primary}`}>
+			<View className='flex-row items-center mb-2'>
+				{icon && <Text className='text-lg mr-2'>{icon}</Text>}
+				<Text
+					className={`text-sm font-semibold ${themed.text.secondary} uppercase tracking-wide`}>
+					{title}
+				</Text>
+			</View>
+			<Text
+				className={`text-base font-medium ${themed.text.primary} leading-relaxed`}>
+				{value || 'Not provided'}
+			</Text>
+		</View>
+	);
+
+	const getAccountTypeColor = () => {
+		if (user?.superAdmin) return 'bg-purple-500';
+		if (user?.isAdmin) return 'bg-blue-500';
+		return 'bg-green-500';
+	};
+
+	const getAccountTypeText = () => {
+		if (user?.superAdmin) return 'Super Administrator';
+		if (user?.isAdmin) return 'Provider';
+		return 'User';
+	};
+
 	return (
-		<ScrollView className={`flex-1 ${themed.bg.background}`}>
-			<View className='px-6 py-8'>
-				{/* Header */}
-				<View className='items-center mb-8 mt-8'>
-					<View
-						className={`w-24 h-24 rounded-full items-center justify-center mb-4 ${themed.bg.primary}`}>
-						<Text className='text-white text-2xl font-bold'>
-							{user?.name?.charAt(0).toUpperCase() || 'U'}
-						</Text>
+		<ScrollView
+			className={`flex-1 ${themed.bg.background}`}
+			showsVerticalScrollIndicator={false}>
+			{/* Header Section with Gradient Background */}
+			<View className={`${themed.bg.primary} pt-16 pb-8 px-6 rounded-b-3xl`}>
+				<View className='items-center'>
+					{/* Profile Avatar */}
+					<View className='relative mb-4'>
+						<View className='w-28 h-28 rounded-full bg-white/20 backdrop-blur-sm items-center justify-center border-4 border-white/30'>
+							<Text className='text-white text-7xl font-bold'>
+								{user?.name?.charAt(0).toUpperCase() || 'U'}
+							</Text>
+						</View>
+						{/* Online Status Indicator */}
+						<View className='absolute bottom-2 right-2 w-6 h-6 bg-green-400 rounded-full border-3 border-white' />
 					</View>
-					<Text className={`text-2xl font-bold mb-2 ${themed.text.primary}`}>
+
+					{/* User Name and Email */}
+					<Text className='text-white text-2xl font-bold mb-1'>
 						{user?.name || 'User'}
 					</Text>
-					<Text className={`text-base ${themed.text.secondary}`}>
+					<Text className='text-white/80 text-base font-medium'>
 						{user?.email}
+					</Text>
+
+					{/* Account Type Badge */}
+					<View
+						className={`mt-4 px-4 py-2 rounded-full ${getAccountTypeColor()} flex-row items-center`}>
+						<View className='w-2 h-2 rounded-full bg-white mr-2' />
+						<Text className='text-white text-sm font-semibold'>
+							{getAccountTypeText()}
+						</Text>
+					</View>
+				</View>
+			</View>
+
+			{/* Content Section */}
+			<View className='px-6 py-6 -mt-4'>
+				{/* Profile Information */}
+				<Text className={`text-xl font-bold ${themed.text.primary} mb-4`}>
+					Profile Information
+				</Text>
+
+				<ProfileCard
+					title='Full Name'
+					value={user?.name}
+					icon='👤'
+				/>
+
+				<ProfileCard
+					title='Email Address'
+					value={user?.email}
+					icon='📧'
+				/>
+
+				<ProfileCard
+					title='Matric Number'
+					value={user?.matricNumber}
+					icon='🎓'
+				/>
+
+				{/* Document Token with Copy Action */}
+				<View
+					className={`${themed.bg.background} rounded-xl p-5 mb-6 shadow-sm border ${themed.border.primary}`}>
+					<View className='flex-row items-center justify-between mb-2'>
+						<View className='flex-row items-center'>
+							<Text className='text-lg mr-2'>🔑</Text>
+							<Text
+								className={`text-sm font-semibold ${themed.text.secondary} uppercase tracking-wide`}>
+								Document Token
+							</Text>
+						</View>
+					</View>
+					<Text
+						className={`text-sm ${themed.text.primary} font-mono p-3 rounded-lg`}>
+						{user?.documentToken || 'Not assigned'}
 					</Text>
 				</View>
 
-				{/* User Info Cards */}
-				<View className='mb-8'>
-					{/* Full Name */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Full Name
-						</Text>
-						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.name || 'Not provided'}
-						</Text>
-					</View>
-
-					{/* Email */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Email Address
-						</Text>
-						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.email || 'Not provided'}
-						</Text>
-					</View>
-
-					{/* Matric Number */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Matric Number
-						</Text>
-						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.matricNumber || 'Not provided'}
-						</Text>
-					</View>
-
-					{/* User ID */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							User ID
-						</Text>
-						<Text
-							className={`text-base ${themed.text.primary} font-mono text-xs`}>
-							{user?.id || 'Not available'}
-						</Text>
-					</View>
-
-					{/* Account Type */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Account Type
-						</Text>
-						<View className='flex-row items-center'>
-							<View
-								className={`w-2 h-2 rounded-full mr-2 ${
-									user?.isAdmin ? 'bg-blue-500' : 'bg-green-500'
-								}`}
-							/>
-							<Text className={`text-base ${themed.text.primary}`}>
-								{user?.superAdmin
-									? 'Super Administrator'
-									: user?.isAdmin
-									? 'Administrator'
-									: 'Student'}
-							</Text>
-						</View>
-					</View>
-
-					{/* Document Token */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Document Token
-						</Text>
-						<Text
-							className={`text-base ${themed.text.primary} font-mono text-xs`}>
-							{user?.documentToken || 'Not assigned'}
-						</Text>
-					</View>
-
-					{/* Documents Received */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Documents Received
-						</Text>
-						<Text className={`text-base ${themed.text.primary}`}>
-							{user?.documentsReceived !== undefined
-								? user.documentsReceived
-								: 0}
-						</Text>
-					</View>
-
-					{/* Verification Status */}
-					<View
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text
-							className={`text-sm font-medium mb-1 ${themed.text.secondary}`}>
-							Verification Status
-						</Text>
-						<View className='flex-row items-center'>
-							<View
-								className={`w-2 h-2 rounded-full mr-2 ${
-									user?.isVerified ? 'bg-green-500' : 'bg-red-500'
-								}`}
-							/>
-							<Text className={`text-base ${themed.text.primary}`}>
-								{user?.isVerified ? 'Verified' : 'Not Verified'}
-							</Text>
-						</View>
-					</View>
-				</View>
-
-				{/* Actions */}
+				{/* Action Buttons */}
 				<View className='mb-8'>
 					<TouchableOpacity
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text className={`text-base font-medium ${themed.text.primary}`}>
-							Edit Profile
-						</Text>
+						className={`${themed.bg.background} rounded-xl p-4 mb-4 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
+						<View className='flex-row items-center'>
+							<Text className='text-lg mr-3'>✏️</Text>
+							<Text className={`text-base font-medium ${themed.text.primary}`}>
+								Edit Profile
+							</Text>
+						</View>
+						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text className={`text-base font-medium ${themed.text.primary}`}>
-							Change Password
-						</Text>
+						className={`${themed.bg.background} rounded-xl p-4 mb-4 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
+						<View className='flex-row items-center'>
+							<Text className='text-lg mr-3'>🔒</Text>
+							<Text className={`text-base font-medium ${themed.text.primary}`}>
+								Privacy Settings
+							</Text>
+						</View>
+						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						className={`p-4 rounded-lg mb-4 border ${themed.bg.background} ${themed.border.primary}`}>
-						<Text className={`text-base font-medium ${themed.text.primary}`}>
-							Settings
-						</Text>
+						className={`${themed.bg.background} rounded-xl p-4 mb-6 shadow-sm border ${themed.border.primary} flex-row items-center justify-between`}>
+						<View className='flex-row items-center'>
+							<Text className='text-lg mr-3'>❓</Text>
+							<Text className={`text-base font-medium ${themed.text.primary}`}>
+								Help & Support
+							</Text>
+						</View>
+						<Text className={`text-lg ${themed.text.secondary}`}>›</Text>
 					</TouchableOpacity>
 				</View>
-
-				{/* Debug Info (Development Only) */}
-				{__DEV__ && (
-					<View className='mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800'>
-						<Text className={`text-sm font-medium mb-2 ${themed.text.primary}`}>
-							🔧 Debug Info
-						</Text>
-						<Text className={`text-xs ${themed.text.secondary} mb-1`}>
-							User authenticated: {user ? 'Yes' : 'No'}
-						</Text>
-						<Text className={`text-xs ${themed.text.secondary} mb-1`}>
-							User ID: {user?.id || 'None'}
-						</Text>
-						<Text className={`text-xs ${themed.text.secondary}`}>
-							Check console for logout logs
-						</Text>
-					</View>
-				)}
 
 				{/* Logout Button */}
 				<AuthButton
 					title='Sign Out'
 					onPress={handleLogout}
-					variant='outline'
+					variant='primary'
 					size='large'
 				/>
 
 				{/* App Info */}
-				<View className='items-center mt-8 pt-8 border-t border-gray-200 dark:border-gray-700'>
-					<Image
-						source={icons.logo}
-						className='w-8 h-8 mb-2'
-						resizeMode='contain'
-					/>
-					<Text className={`text-sm ${themed.text.secondary}`}>
-						UploadDoc v1.0.2
+				<View className='items-center mt-8 pt-6'>
+					<View className='flex-row items-center mb-3'>
+						<Image
+							source={icons.logo}
+							className='w-6 h-6 mr-2 rounded'
+							resizeMode='contain'
+						/>
+						<Text className={`text-sm font-medium ${themed.text.primary}`}>
+							UploadDoc
+						</Text>
+					</View>
+					<Text className={`text- font-semibold ${themed.text.secondary}`}>
+						Version 1.0.2
 					</Text>
 				</View>
 			</View>

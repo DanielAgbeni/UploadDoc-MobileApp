@@ -58,7 +58,7 @@ const _layout = () => {
 				tabBarStyle: {
 					backgroundColor: colors.background,
 					height: 70,
-					position: 'absolute',
+					position: 'fixed',
 					overflow: 'hidden',
 				},
 			}}>
