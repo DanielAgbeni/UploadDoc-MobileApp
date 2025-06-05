@@ -6,7 +6,9 @@ import close from '@/assets/icons/close.png';
 import darkModeIcon from '@/assets/icons/dark_mode.png';
 import dashboardIcon from '@/assets/icons/dashboard.png';
 import explore from '@/assets/icons/explore.png';
+import google from '@/assets/icons/google.png';
 import home from '@/assets/icons/home.png';
+import logo from '@/assets/icons/icon.png';
 import schedule from '@/assets/icons/schedule.png';
 import search from '@/assets/icons/search.png';
 import upload from '@/assets/icons/upload_file.png';
@@ -24,4 +26,6 @@ export const icons = {
 	darkModeIcon,
 	explore,
 	dashboardIcon,
+	logo,
+	google,
 };

@@ -1,34 +1,48 @@
 import { icons } from '@/constants/icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, Text } from 'react-native';
+import Animated, {
+	useAnimatedStyle,
+	withTiming,
+} from 'react-native-reanimated';
+import { useTheme } from '../hooks/useTheme';
 
 const TabIcon = ({ focused, icons, title }: any) => {
-	if (focused)
-		return (
-			<View className='flex flex-row w-full flex-1 min-w-[112px] min-h-16 mt-4 justify-center items-center rounded-full overflow-hidden'>
-				<Image
-					source={icons}
-					tintColor='#151312'
-					className='size-8'
-				/>
-				<Text className='text-secondary text-base font-semibold ml-2'>
-					{title}
-				</Text>
-			</View>
-		);
+	const { themed, colors } = useTheme();
+
+	const animatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ scale: withTiming(focused ? 1.1 : 1, { duration: 200 }) }],
+			opacity: withTiming(focused ? 1 : 0.6, { duration: 200 }),
+		};
+	}, [focused]);
+
 	return (
-		<View className=' items-center justify-center flex size-full mt-4 rounded-full'>
+		<Animated.View
+			style={animatedStyle}
+			className={`flex-row items-center justify-center mt-4 ${
+				focused
+					? `w-full flex-1 min-w-[112px] min-h-16 rounded-xl ${themed.bg.secondary}`
+					: 'size-full rounded-full'
+			}`}>
 			<Image
 				source={icons}
-				tintColor=''
+				tintColor={focused ? colors.text : colors.text}
 				className='size-8'
 			/>
-		</View>
+			{focused && (
+				<Text className={`text-base font-semibold ml-2 ${themed.text.primary}`}>
+					{title}
+				</Text>
+			)}
+		</Animated.View>
 	);
 };
 
 const _layout = () => {
+	const { colors } = useTheme();
+
 	return (
 		<Tabs
 			screenOptions={{
@@ -40,15 +54,10 @@ const _layout = () => {
 					alignItems: 'center',
 				},
 				tabBarStyle: {
-					backgroundColor: '#0f0D23',
-					// borderRadius: 50,
-					// marginHorizontal: 20,
-					// marginBottom: 36,
-					height: 100,
+					backgroundColor: colors.background,
+					height: 70,
 					position: 'absolute',
 					overflow: 'hidden',
-					borderWidth: 1,
-					borderColor: '#0f0d23',
 				},
 			}}>
 			<Tabs.Screen
