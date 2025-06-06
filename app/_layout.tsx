@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { TabProvider } from './context/TabContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './globals.css';
 import { useTheme } from './hooks/useTheme';
@@ -43,7 +44,9 @@ export default function RootLayout() {
 	return (
 		<ThemeProvider>
 			<AuthProvider>
-				<RootLayoutNav />
+				<TabProvider>
+					<RootLayoutNav />
+				</TabProvider>
 			</AuthProvider>
 		</ThemeProvider>
 	);

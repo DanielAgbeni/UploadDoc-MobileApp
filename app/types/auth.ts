@@ -89,3 +89,36 @@ export interface UpdateProfileRequest {
 	supportContact?: string;
 	additionalInfo?: string;
 }
+
+export interface AdminResult {
+	_id: string;
+	name: string;
+	email: string;
+	matricNumber: string;
+	isAdmin: boolean;
+	superAdmin: boolean;
+	isVerified: boolean;
+	documentsReceived: number;
+	documentToken: number;
+	openingHours?: string | null;
+	printingCost?: number | null;
+	printingLocation?: string | null;
+	discountRates: DiscountRate[];
+	rating: number;
+	adminStatus: string;
+	queueTimeEstimate: number;
+	supportContact?: string | null;
+	additionalInfo?: string | null;
+	reviews: ReviewResult[];
+	profilePicture?: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ReviewResult {
+	_id: string;
+	userId: string;
+	name: string;
+	rating: number;
+	comment: string;
+}

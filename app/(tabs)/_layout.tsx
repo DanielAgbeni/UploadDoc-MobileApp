@@ -7,6 +7,7 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 import { useAuth } from '../context/AuthContext';
+import { useTab } from '../context/TabContext'; // <--- Import useTab
 import { useTheme } from '../hooks/useTheme';
 
 const TabIcon = ({ focused, icons, title }: any) => {
@@ -33,7 +34,7 @@ const TabIcon = ({ focused, icons, title }: any) => {
 				className='size-8'
 			/>
 			{focused && (
-				<Text className={`text-base font-semibold ml-2 ${themed.text.primary}`}>
+				<Text className={`text-base font-semibold ml-2 ${themed.text.text}`}>
 					{title}
 				</Text>
 			)}
@@ -44,9 +45,20 @@ const TabIcon = ({ focused, icons, title }: any) => {
 const _layout = () => {
 	const { colors } = useTheme();
 	const { user } = useAuth();
+	// Get lastActiveTab from your context
+	const { lastActiveTab, setLastActiveTab } = useTab();
+
+	// Determine the initial tab name based on the last active tab
+	let initialTabRoute = 'index'; // Default to 'index' if no specific tab was saved or it's not a tab route
+	if (lastActiveTab && lastActiveTab.startsWith('(tabs)/')) {
+		// Extract the actual route name (e.g., 'explore' from '(tabs)/explore')
+		initialTabRoute = lastActiveTab.replace('(tabs)/', '');
+	}
 
 	return (
 		<Tabs
+			// Set the initial route name for the Tabs component
+			initialRouteName={initialTabRoute}
 			screenOptions={{
 				tabBarShowLabel: false,
 				tabBarItemStyle: {
@@ -60,6 +72,17 @@ const _layout = () => {
 					height: 70,
 					position: 'fixed',
 					overflow: 'hidden',
+				},
+			}}
+			screenListeners={{
+				tabPress: (e) => {
+					// Update the last active tab when a tab is pressed
+					// e.target will be something like "(tabs)/index-tab"
+					const routeName = e.target?.split('-')[0];
+					if (routeName) {
+						// Store the full path including '(tabs)/'
+						setLastActiveTab(routeName);
+					}
 				},
 			}}>
 			<Tabs.Screen
