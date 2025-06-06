@@ -170,8 +170,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 	const logout = async (): Promise<void> => {
 		try {
-			console.log('Starting logout process...');
-
 			// Clear all stored authentication data
 			await StorageService.clearAuthData();
 

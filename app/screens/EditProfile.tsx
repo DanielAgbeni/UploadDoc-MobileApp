@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { icons } from '../../constants/icons';
 import { AuthButton } from '../components/auth/AuthButton';
-import { AuthInput } from '../components/auth/AuthInput';
+import { FormInput } from '../components/FormInput';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../hooks/useTheme';
 import { ProfileService } from '../services/profileService';
@@ -27,9 +27,9 @@ const PRESET_OPENING_HOURS = [
 ];
 
 const EditProfile = () => {
-	const { themed } = useTheme();
-	const { user, token, checkAuthStatus } = useAuth();
 	const router = useRouter();
+	const { themed } = useTheme();
+	const { user, token } = useAuth();
 
 	// Safety timeout to prevent infinite loading
 	useEffect(() => {
@@ -152,7 +152,17 @@ const EditProfile = () => {
 	}, [user, isAdmin]);
 
 	const handleChange = (field: string, value: string) => {
-		setProfile({ ...profile, [field]: value });
+		setProfile((prev) => ({ ...prev, [field]: value }));
+	};
+
+	const handleOpeningHoursChange = (hours: string) => {
+		console.log('Changing opening hours to:', hours);
+		setProfile((prev) => ({
+			...prev,
+			openingHours: hours,
+			// Clear custom hours if selecting a preset
+			customOpeningHours: hours === 'Custom' ? prev.customOpeningHours : '',
+		}));
 	};
 
 	const handleNewDiscountChange = (field: string, value: string) => {
@@ -218,8 +228,8 @@ const EditProfile = () => {
 			setMessage('Profile updated successfully');
 			setTimeout(() => setMessage(''), 5000);
 
-			// Refresh auth status to get updated user data
-			await checkAuthStatus();
+			// Refresh auth status to get updated user data (commented out to prevent navigation issues)
+			// await checkAuthStatus();
 
 			// Navigate back after successful update
 			// setTimeout(() => router.back(), 2000);
@@ -251,12 +261,14 @@ const EditProfile = () => {
 	return (
 		<KeyboardAvoidingView
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			className='flex-1'>
+			className='flex-1'
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
 			<ScrollView
 				className={`flex-1 ${themed.bg.background}`}
-				contentContainerStyle={{ flexGrow: 1 }}
+				contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
 				keyboardShouldPersistTaps='handled'
-				showsVerticalScrollIndicator={false}>
+				showsVerticalScrollIndicator={false}
+				automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}>
 				{/* Header Section */}
 				<View
 					className={`${themed.bg.background} border-b ${themed.border.primary} mt-3 pb-4 pt-12 px-6 shadow-sm`}>
@@ -295,7 +307,6 @@ const EditProfile = () => {
 							</View>
 						</View>
 					)}
-
 					{error && (
 						<View className='mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 shadow-sm'>
 							<View className='flex-row items-center'>
@@ -306,7 +317,6 @@ const EditProfile = () => {
 							</View>
 						</View>
 					)}
-
 					{/* Basic Information Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
@@ -318,21 +328,21 @@ const EditProfile = () => {
 						</Text>
 
 						<View className='space-y-4'>
-							<AuthInput
+							<FormInput
 								label='Printing Cost (per page)'
 								value={profile.printingCost}
 								onChangeText={(text) => handleChange('printingCost', text)}
 								placeholder='e.g., ₦10 per page'
 							/>
 
-							<AuthInput
+							<FormInput
 								label='Printing Location'
 								value={profile.printingLocation}
 								onChangeText={(text) => handleChange('printingLocation', text)}
 								placeholder='e.g., Main Library, Ground Floor'
 							/>
 
-							<AuthInput
+							<FormInput
 								label='Support Contact'
 								value={profile.supportContact}
 								onChangeText={(text) => handleChange('supportContact', text)}
@@ -342,8 +352,7 @@ const EditProfile = () => {
 						</View>
 					</View>
 
-					{/* Opening Hours Section */}
-					<View
+					{/* <View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
 						<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
 							Operating Hours
@@ -356,11 +365,12 @@ const EditProfile = () => {
 							{PRESET_OPENING_HOURS.map((hours) => (
 								<TouchableOpacity
 									key={hours}
-									onPress={() => handleChange('openingHours', hours)}
+									onPress={() => handleOpeningHoursChange(hours)}
+									activeOpacity={0.7}
 									className={`px-4 py-3 rounded-xl border-2 ${
 										profile.openingHours === hours
 											? `${themed.bg.primary} border-transparent shadow-md`
-											: `${themed.bg.background} ${themed.border.primary} hover:border-blue-300`
+											: `${themed.bg.background} ${themed.border.primary}`
 									}`}>
 									<Text
 										className={`text-sm font-medium ${
@@ -376,7 +386,7 @@ const EditProfile = () => {
 
 						{profile.openingHours === 'Custom' && (
 							<View className='mt-4'>
-								<AuthInput
+								<FormInput
 									label='Custom Opening Hours'
 									value={profile.customOpeningHours}
 									onChangeText={(text) =>
@@ -386,8 +396,7 @@ const EditProfile = () => {
 								/>
 							</View>
 						)}
-					</View>
-
+					</View> */}
 					{/* Discount Rates Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
@@ -439,7 +448,7 @@ const EditProfile = () => {
 							</Text>
 							<View className='flex-row gap-3 mb-4'>
 								<View className='flex-1'>
-									<AuthInput
+									<FormInput
 										label='Min Pages'
 										value={newDiscount.minPages}
 										onChangeText={(text) =>
@@ -450,7 +459,7 @@ const EditProfile = () => {
 									/>
 								</View>
 								<View className='flex-1'>
-									<AuthInput
+									<FormInput
 										label='Max Pages'
 										value={newDiscount.maxPages}
 										onChangeText={(text) =>
@@ -461,7 +470,7 @@ const EditProfile = () => {
 									/>
 								</View>
 								<View className='flex-1'>
-									<AuthInput
+									<FormInput
 										label='Discount %'
 										value={newDiscount.discount}
 										onChangeText={(text) =>
@@ -480,7 +489,6 @@ const EditProfile = () => {
 							</TouchableOpacity>
 						</View>
 					</View>
-
 					{/* Additional Information Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.primary}`}>
@@ -491,14 +499,16 @@ const EditProfile = () => {
 							Any extra details about your service
 						</Text>
 
-						<AuthInput
+						<FormInput
 							label='Additional Information'
 							value={profile.additionalInfo}
 							onChangeText={(text) => handleChange('additionalInfo', text)}
-							placeholder='Any additional details about your service'
+							placeholder='Any additional details about your service (e.g., special offers, terms, contact hours)'
+							multiline={true}
+							numberOfLines={4}
+							maxLength={500}
 						/>
 					</View>
-
 					{/* Submit Button */}
 					<View className='pb-6'>
 						<AuthButton

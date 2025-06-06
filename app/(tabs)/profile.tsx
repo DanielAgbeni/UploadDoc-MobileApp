@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
 	Alert,
 	Image,
 	Linking,
+	RefreshControl,
 	ScrollView,
 	Text,
 	TouchableOpacity,
@@ -16,9 +17,31 @@ import { useTheme } from '../hooks/useTheme';
 
 const Profile = () => {
 	const { themed } = useTheme();
-	const { user, logout } = useAuth();
+	const { user, logout, checkAuthStatus } = useAuth();
 	const router = useRouter();
-	console.log('User', user);
+
+	const [refreshing, setRefreshing] = useState(false);
+
+	const onRefresh = useCallback(async () => {
+		setRefreshing(true);
+		try {
+			if (checkAuthStatus) {
+				await checkAuthStatus(); // This function should fetch /api/auth/status and update the user context
+			} else {
+				console.warn(
+					'checkAuthStatus function is not available on useAuth hook',
+				);
+			}
+		} catch (error) {
+			console.error('Failed to refresh user status:', error);
+			Alert.alert(
+				'Refresh Error',
+				'Could not update profile data. Please try again.',
+			);
+		} finally {
+			setRefreshing(false);
+		}
+	}, [checkAuthStatus]);
 
 	const handleLogout = () => {
 		Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -71,7 +94,15 @@ const Profile = () => {
 	return (
 		<ScrollView
 			className={`flex-1 ${themed.bg.background}`}
-			showsVerticalScrollIndicator={false}>
+			showsVerticalScrollIndicator={false}
+			refreshControl={
+				<RefreshControl
+					refreshing={refreshing}
+					onRefresh={onRefresh}
+					colors={['#444ebb']}
+					tintColor={'#444ebb'}
+				/>
+			}>
 			{/* Header */}
 			<View className={`${themed.bg.primary} pt-16 pb-10 px-6 rounded-b-3xl`}>
 				<View className='items-center'>
@@ -87,7 +118,7 @@ const Profile = () => {
 					<Text className='text-white text-2xl font-bold mb-1'>
 						{user?.name || 'User'}
 					</Text>
-					<Text className='text-white/80'>{user?.email}</Text>
+					<Text className='text-white/80 font-normal'>{user?.email}</Text>
 
 					<View
 						className={`mt-4 px-4 py-1 rounded-full ${getAccountTypeColor()} flex-row items-center`}>
@@ -191,7 +222,7 @@ const Profile = () => {
 							Document Token
 						</Text>
 					</View>
-					<Text className={`text-sm font-mono ${themed.text.text}`}>
+					<Text className={`text-sm font-semibold ${themed.text.text}`}>
 						{user?.documentToken || 'Not assigned'}
 					</Text>
 				</View>

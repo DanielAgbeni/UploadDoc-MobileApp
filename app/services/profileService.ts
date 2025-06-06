@@ -27,12 +27,12 @@ class ProfileServiceClass {
 			console.log(`Making request to: ${BASE_URL}${endpoint}`);
 
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
+				...options,
 				headers: {
 					'Content-Type': 'application/json',
 					...(token && { Authorization: `Bearer ${token}` }),
-					...options.headers,
+					...(options.headers ?? {}),
 				},
-				...options,
 			});
 
 			console.log(`Response status: ${response.status}`);
@@ -71,10 +71,7 @@ class ProfileServiceClass {
 		);
 	}
 
-	async getUserProfile(
-		userId: string,
-		token: string,
-	): Promise<User> {
+	async getUserProfile(userId: string, token: string): Promise<User> {
 		return this.makeRequest<User>(
 			`/api/users/${userId}`,
 			{
