@@ -6,7 +6,13 @@ import {
 	requestPermissionsAsync,
 } from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import {
 	ActivityIndicator,
 	Alert,
@@ -38,7 +44,7 @@ const Dashboard = () => {
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 	const [searchQuery, setSearchQuery] = useState(''); // New: search query state
-	const searchDebounceRef = useRef<NodeJS.Timeout | null>(null); // New: debounce ref
+	const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null); // New: debounce ref
 
 	const fetchProjects = async (pageNum = page) => {
 		if (!user?._id || !token) {
@@ -82,13 +88,17 @@ const Dashboard = () => {
 		fetchProjects(newPage);
 	};
 
-	const handleSearchChange = (text: string) => {
+	const handleSearchChange = useCallback((text: string) => {
 		setSearchQuery(text);
 
 		if (searchDebounceRef.current) {
 			clearTimeout(searchDebounceRef.current);
 		}
-	};
+
+		searchDebounceRef.current = setTimeout(() => {
+			setSearchQuery(text);
+		}, 500); // 500ms delay
+	}, []);
 
 	// Filter projects based on search query
 	const filteredProjects = useMemo(() => {
@@ -207,7 +217,7 @@ const Dashboard = () => {
 											await IntentLauncher.startActivityAsync(
 												'android.intent.action.MEDIA_SCANNER_SCAN_FILE',
 												{
-													data: `file://${downloadResult.uri}`,
+													data: downloadResult.uri,
 												},
 											);
 										} catch (scanError) {
