@@ -30,11 +30,11 @@ const TabIcon = ({ focused, icons, title }: any) => {
 			}`}>
 			<Image
 				source={icons}
-				tintColor={focused ? colors.text : colors.text}
+				tintColor={focused ? '#ffffff' : colors.text}
 				className='size-8'
 			/>
 			{focused && (
-				<Text className={`text-base font-semibold ml-2 ${themed.text.text}`}>
+				<Text className={`text-base font-semibold ml-2 text-white`}>
 					{title}
 				</Text>
 			)}

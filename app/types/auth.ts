@@ -89,36 +89,38 @@ export interface UpdateProfileRequest {
 	supportContact?: string;
 	additionalInfo?: string;
 }
-
-export interface AdminResult {
+export interface Admin {
 	_id: string;
 	name: string;
 	email: string;
-	matricNumber: string;
+	matricNumber?: string;
 	isAdmin: boolean;
 	superAdmin: boolean;
 	isVerified: boolean;
-	documentsReceived: number;
-	documentToken: number;
-	openingHours?: string | null;
-	printingCost?: number | null;
-	printingLocation?: string | null;
-	discountRates: DiscountRate[];
-	rating: number;
-	adminStatus: string;
-	queueTimeEstimate: number;
-	supportContact?: string | null;
-	additionalInfo?: string | null;
-	reviews: ReviewResult[];
-	profilePicture?: string | null;
-	createdAt: string;
-	updatedAt: string;
+	documentsReceived?: number;
+	documentToken?: string;
+	openingHours?: string;
+	printingCost?: number; // Assuming a number, e.g., currency
+	printingLocation?: string;
+	discountRates?: Record<string, number>; // Example for a map of string to number
+	rating?: number; // Assuming a number, e.g., 1-5
+	adminStatus?: string;
+	queueTimeEstimate?: string;
+	supportContact?: string;
+	additionalInfo?: string;
+	reviews?: any[]; // You might want to define a specific type for reviews if you use them
+	profilePicture?: string;
+	createdAt: string; // Assuming ISO date string
+	updatedAt: string; // Assuming ISO date string
 }
 
-export interface ReviewResult {
-	_id: string;
-	userId: string;
-	name: string;
-	rating: number;
-	comment: string;
+// Define the structure of the successful response from getAdmins
+export interface AdminPaginationResponse {
+	admins: Admin[];
+	pagination: {
+		totalCount: number;
+		totalPages: number;
+		currentPage: number;
+		limit: number;
+	};
 }
