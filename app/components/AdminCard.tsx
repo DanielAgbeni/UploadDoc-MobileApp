@@ -1,10 +1,20 @@
 // components/AdminCard.tsx
+import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../hooks/useTheme'; // Assuming this path is correct
+import { useTheme } from '../hooks/useTheme';
+import { Admin } from '../types/auth';
 
-const AdminCard = ({ admin }: { admin: any }) => {
+const AdminCard = ({ admin }: { admin: Admin }) => {
 	const { themed } = useTheme();
+
+	const handleSelectProvider = () => {
+		router.push({
+			pathname: '/screens/upload-document' as any,
+			params: { selectedAdmin: admin._id },
+		});
+	};
+	console.log(admin._id);
 
 	return (
 		<View
@@ -39,7 +49,7 @@ const AdminCard = ({ admin }: { admin: any }) => {
 					${themed.bg['button-primary']}  
 					shadow-md dark:shadow-lg
 				`}
-				onPress={() => alert(`Selected: ${admin.name}`)}>
+				onPress={handleSelectProvider}>
 				<Text
 					className={`text-center font-medium ${themed.text['on-button-primary']}`}>
 					Select Provider

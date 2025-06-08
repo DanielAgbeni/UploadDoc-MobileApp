@@ -89,8 +89,6 @@ const Dashboard = () => {
 	};
 
 	const handleSearchChange = useCallback((text: string) => {
-		setSearchQuery(text);
-
 		if (searchDebounceRef.current) {
 			clearTimeout(searchDebounceRef.current);
 		}
