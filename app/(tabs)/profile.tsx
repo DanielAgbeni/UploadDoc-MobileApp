@@ -214,19 +214,20 @@ const Profile = () => {
 				)}
 
 				{/* Document Token */}
-				<View className={`${themed.bg.card} rounded-2xl p-5 mb-6 shadow-sm`}>
-					<View className='flex-row items-center mb-2'>
-						<Text className='text-lg mr-2'>🔑</Text>
-						<Text
-							className={`text-xs uppercase font-semibold tracking-wide ${themed.text.text}`}>
-							Document Token
+				{user?.isAdmin && (
+					<View className={`${themed.bg.card} rounded-2xl p-5 mb-6 shadow-sm`}>
+						<View className='flex-row items-center mb-2'>
+							<Text className='text-lg mr-2'>🔑</Text>
+							<Text
+								className={`text-xs uppercase font-semibold tracking-wide ${themed.text.text}`}>
+								Document Token
+							</Text>
+						</View>
+						<Text className={`text-sm font-semibold ${themed.text.text}`}>
+							{user?.documentToken || 'Not assigned'}
 						</Text>
 					</View>
-					<Text className={`text-sm font-semibold ${themed.text.text}`}>
-						{user?.documentToken || 'Not assigned'}
-					</Text>
-				</View>
-
+				)}
 				{/* Action Items */}
 				<View className='gap-4 mb-8'>
 					{[

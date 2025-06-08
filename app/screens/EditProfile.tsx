@@ -34,7 +34,6 @@ const EditProfile = () => {
 	// Safety timeout to prevent infinite loading
 	useEffect(() => {
 		const safetyTimeout = setTimeout(() => {
-			console.log('Safety timeout triggered, stopping loading');
 			setFetchLoading(false);
 		}, 5000); // 5 seconds timeout
 
@@ -68,10 +67,9 @@ const EditProfile = () => {
 
 	// Check if user is admin
 	useEffect(() => {
-		console.log('Checking admin status for user:', user);
 		if (user) {
 			const adminStatus = user?.isAdmin || user?.superAdmin;
-			console.log('Admin status:', adminStatus);
+
 			setIsAdmin(adminStatus);
 
 			if (!adminStatus) {
@@ -82,7 +80,6 @@ const EditProfile = () => {
 				);
 			}
 		} else {
-			console.log('No user found, setting loading to false');
 			setFetchLoading(false);
 		}
 	}, [user]);
@@ -91,7 +88,6 @@ const EditProfile = () => {
 	useEffect(() => {
 		const initializeProfile = () => {
 			if (!user) {
-				console.log('No user, stopping loading');
 				setFetchLoading(false);
 				return;
 			}
@@ -135,8 +131,6 @@ const EditProfile = () => {
 						customOpeningHours: user.openingHours || '',
 					}));
 				}
-
-				console.log('Profile initialized successfully:', initial);
 			} catch (err) {
 				console.error('Error initializing profile:', err);
 				setError('Failed to load profile data. Please try again later.');
@@ -156,7 +150,6 @@ const EditProfile = () => {
 	};
 
 	const handleOpeningHoursChange = (hours: string) => {
-		console.log('Changing opening hours to:', hours);
 		setProfile((prev) => ({
 			...prev,
 			openingHours: hours,

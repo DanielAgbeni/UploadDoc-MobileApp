@@ -34,30 +34,26 @@ export default function UploadDocumentScreen() {
 	const defaultFontClass = 'font-inter';
 
 	useEffect(() => {
-		console.log('useEffect triggered with:', { selectedAdminId, token });
 		if (selectedAdminId && token) {
 			setIsLoading(true);
-			console.log('Fetching admin with ID:', selectedAdminId);
+
 			AdminService.getAdmins(1, 1, selectedAdminId)
 				.then((response) => {
-					console.log('Admin response:', response);
 					if (response.admins && response.admins.length > 0) {
 						setSelectedAdmin(response.admins[0]);
-						console.log('Admin loaded:', response.admins[0]);
 					} else {
-						console.log('No admin found in response');
 						Alert.alert('Error', 'Provider not found.');
 					}
 				})
 				.catch((error) => {
-					console.error('Error fetching admin details:', error);
 					Alert.alert('Error', 'Failed to load pre-selected provider.');
 				})
 				.finally(() => {
 					setIsLoading(false);
 				});
 		} else {
-			console.log('Missing required data:', { selectedAdminId, token });
+			Alert.alert('Error', 'Missing required data.');
+			setIsLoading(false);
 		}
 	}, [selectedAdminId, token]);
 
@@ -230,7 +226,7 @@ export default function UploadDocumentScreen() {
 								<TextInput
 									value={adminSearch}
 									onChangeText={setAdminSearch}
-									placeholder='Search for a provider by name or ID'
+									placeholder='Search for a provider by name'
 									className={`border-2 rounded-xl p-5 mb-3 ${themed.border.input} ${themed.bg.input} ${themed.text.input} ${defaultFontClass}`}
 									placeholderTextColor={colors['input-placeholder']}
 								/>

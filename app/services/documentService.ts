@@ -1,25 +1,24 @@
-import Constants from 'expo-constants';
 import { ApiError, Project, ProjectPaginationResponse } from '../types/auth';
 
-const getBaseUrl = () => {
-	// For development, use your machine's IP address
-	// You can find your IP by running: ipconfig (Windows) or ifconfig (Mac/Linux)
-	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+// const getBaseUrl = () => {
+// 	// For development, use your machine's IP address
+// 	// You can find your IP by running: ipconfig (Windows) or ifconfig (Mac/Linux)
+// 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
 
-	if (__DEV__) {
-		// If running in development and we can get the debugger host
-		if (debuggerHost) {
-			return `http://${debuggerHost}:5000`;
-		}
-		// Fallback for development - using your machine's IP
-		return 'http://192.168.137.156:5000'; // Your machine's IP address
-	}
+// 	if (__DEV__) {
+// 		// If running in development and we can get the debugger host
+// 		if (debuggerHost) {
+// 			return `http://${debuggerHost}:5000`;
+// 		}
+// 		// Fallback for development - using your machine's IP
+// 		return 'http://192.168.137.156:5000'; // Your machine's IP address
+// 	}
 
-	// For production, use your actual server URL
-	return 'https://your-production-api.com';
-};
+// 	// For production, use your actual server URL
+// 	return 'https://your-production-api.com';
+// };
 
-const BASE_URL = getBaseUrl();
+const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class DocumentServiceClass {
 	private async makeRequest<T>(
@@ -28,15 +27,6 @@ class DocumentServiceClass {
 		token?: string,
 	): Promise<T> {
 		try {
-			console.log('Making request to:', `${BASE_URL}${endpoint}`);
-			console.log('Request options:', {
-				...options,
-				headers: {
-					...(token && { Authorization: `Bearer ${token}` }),
-					...(options.headers ?? {}),
-				},
-			});
-
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
 				...options,
 				headers: {
@@ -47,21 +37,14 @@ class DocumentServiceClass {
 				},
 			});
 
-			// Log response status and headers
-			console.log('Response status:', response.status);
-			console.log('Response headers:', [...response.headers.entries()]);
-
 			// Try to get the response text first
 			const responseText = await response.text();
-			console.log('Response text:', responseText);
 
 			let data;
 			try {
 				// Then parse it as JSON
 				data = JSON.parse(responseText);
 			} catch (parseError) {
-				console.error('JSON Parse error:', parseError);
-				console.error('Raw response:', responseText);
 				throw {
 					message: 'Invalid response from server. Please try again.',
 					details: responseText.substring(0, 100), // Log first 100 chars of response

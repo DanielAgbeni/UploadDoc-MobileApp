@@ -102,11 +102,6 @@ export default function LoginScreen() {
 		}
 	};
 
-	const handleGoogleSuccess = () => {
-		// Navigation will be handled by the auth context
-		console.log('Google sign-in successful');
-	};
-
 	const handleGoogleError = (errorMessage: string) => {
 		Alert.alert('Google Sign-in Failed', errorMessage);
 	};
@@ -226,10 +221,7 @@ export default function LoginScreen() {
 					</View>
 
 					{/* Google Sign In */}
-					<GoogleSignInButton
-						onSuccess={handleGoogleSuccess}
-						onError={handleGoogleError}
-					/>
+					<GoogleSignInButton onError={handleGoogleError} />
 
 					{/* Debug: Test Connection Button (Development Only)
 					{__DEV__ && (

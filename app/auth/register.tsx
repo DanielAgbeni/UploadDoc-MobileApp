@@ -104,10 +104,6 @@ export default function RegisterScreen() {
 		}
 	};
 
-	const handleGoogleSuccess = () => {
-		console.log('Google sign-in successful');
-	};
-
 	const handleGoogleError = (errorMessage: string) => {
 		Alert.alert('Google Sign-in Failed', errorMessage);
 	};
@@ -255,10 +251,7 @@ export default function RegisterScreen() {
 					</View>
 
 					{/* Google Sign In */}
-					<GoogleSignInButton
-						onSuccess={handleGoogleSuccess}
-						onError={handleGoogleError}
-					/>
+					<GoogleSignInButton onError={handleGoogleError} />
 
 					{/* Footer Links */}
 					<View className='mt-8 items-center'>

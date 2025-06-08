@@ -1,19 +1,18 @@
-import Constants from 'expo-constants';
 import { ApiError, ProjectPaginationResponse } from '../types/auth';
 
-const getBaseUrl = () => {
-	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+// const getBaseUrl = () => {
+// 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
 
-	if (__DEV__) {
-		if (debuggerHost) {
-			return `http://${debuggerHost}:5000`;
-		}
-		return 'http://192.168.137.156:5000'; // Your machine's IP address
-	}
-	return 'https://your-production-api.com';
-};
+// 	if (__DEV__) {
+// 		if (debuggerHost) {
+// 			return `http://${debuggerHost}:5000`;
+// 		}
+// 		return 'http://192.168.137.156:5000'; // Your machine's IP address
+// 	}
+// 	return 'https://your-production-api.com';
+// };
 
-const BASE_URL = getBaseUrl();
+const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class DashboardServiceClass {
 	private async makeRequest<T>(
@@ -32,7 +31,6 @@ class DashboardServiceClass {
 			});
 
 			const data = await response.json();
-			console.log('Project', data);
 
 			if (!response.ok) {
 				throw data as ApiError;

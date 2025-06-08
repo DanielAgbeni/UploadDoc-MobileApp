@@ -24,8 +24,6 @@ class ProfileServiceClass {
 		token?: string,
 	): Promise<T> {
 		try {
-			console.log(`Making request to: ${BASE_URL}${endpoint}`);
-
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
 				...options,
 				headers: {
@@ -35,19 +33,14 @@ class ProfileServiceClass {
 				},
 			});
 
-			console.log(`Response status: ${response.status}`);
-
 			const data = await response.json();
 
 			if (!response.ok) {
-				console.log('API Error:', data);
 				throw data as ApiError;
 			}
 
 			return data as T;
 		} catch (error) {
-			console.error('Request error:', error);
-
 			if (error instanceof TypeError) {
 				throw {
 					message: `Network error. Cannot connect to server at ${BASE_URL}. Please check your connection and ensure the backend server is running.`,

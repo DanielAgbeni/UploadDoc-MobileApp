@@ -207,8 +207,6 @@ const Dashboard = () => {
 								const downloadResult = await downloadResumable.downloadAsync();
 
 								if (downloadResult && downloadResult.uri) {
-									console.log('File downloaded to:', downloadResult.uri);
-
 									// For Android, we need to explicitly make the file visible in the gallery/media store
 									if (Platform.OS === 'android') {
 										try {
@@ -218,9 +216,7 @@ const Dashboard = () => {
 													data: downloadResult.uri,
 												},
 											);
-										} catch (scanError) {
-											console.log('Media scanning error:', scanError);
-										}
+										} catch (scanError) {}
 									}
 
 									// Give user options after download
@@ -534,6 +530,16 @@ const Dashboard = () => {
 											ellipsizeMode='tail'>
 											{item.pageCount} pages
 										</Text>
+										<TouchableOpacity
+											onPress={() => handleDeleteProject(item._id)}
+											className={`px-4 py-2 rounded-lg ml-3 ${themed.bg['button-delete']}`}>
+											<Text
+												className={`${themed.text['on-button-delete']} font-medium ${defaultFontClass}`}
+												numberOfLines={1}
+												ellipsizeMode='tail'>
+												Delete
+											</Text>
+										</TouchableOpacity>
 										<TouchableOpacity
 											onPress={() => handleDownload(item.fileUrl, item.title)}
 											className={`px-4 py-2 rounded-lg flex-row items-center space-x-2 ${themed.bg['button-download']}`}>

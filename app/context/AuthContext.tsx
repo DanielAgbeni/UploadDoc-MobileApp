@@ -178,8 +178,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 			// Clear any errors
 			clearError();
-
-			console.log('Logout completed successfully');
 		} catch (error) {
 			console.error('Logout error:', error);
 			// Even if there's an error clearing storage, still logout the user

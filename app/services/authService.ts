@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
 import {
 	ApiError,
 	AuthResponse,
@@ -9,25 +8,25 @@ import {
 } from '../types/auth';
 
 // Get the correct base URL for different environments
-const getBaseUrl = () => {
-	// For development, use your machine's IP address
-	// You can find your IP by running: ipconfig (Windows) or ifconfig (Mac/Linux)
-	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+// const getBaseUrl = () => {
+// 	// For development, use your machine's IP address
+// 	// You can find your IP by running: ipconfig (Windows) or ifconfig (Mac/Linux)
+// 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
 
-	if (__DEV__) {
-		// If running in development and we can get the debugger host
-		if (debuggerHost) {
-			return `http://${debuggerHost}:5000`;
-		}
-		// Fallback for development - using your machine's IP
-		return 'http://192.168.137.156:5000'; // Your machine's IP address
-	}
+// 	if (__DEV__) {
+// 		// If running in development and we can get the debugger host
+// 		if (debuggerHost) {
+// 			return `http://${debuggerHost}:5000`;
+// 		}
+// 		// Fallback for development - using your machine's IP
+// 		return 'http://192.168.137.156:5000'; // Your machine's IP address
+// 	}
 
-	// For production, use your actual server URL
-	return 'https://your-production-api.com';
-};
+// 	// For production, use your actual server URL
+// 	return 'https://your-production-api.com';
+// };
 
-const BASE_URL = getBaseUrl();
+const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class AuthServiceClass {
 	private async makeRequest<T>(
@@ -35,8 +34,6 @@ class AuthServiceClass {
 		options: RequestInit = {},
 	): Promise<T> {
 		try {
-			console.log(`Making request to: ${BASE_URL}${endpoint}`);
-
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
 				headers: {
 					'Content-Type': 'application/json',
@@ -45,19 +42,14 @@ class AuthServiceClass {
 				...options,
 			});
 
-			console.log(`Response status: ${response.status}`);
-
 			const data = await response.json();
 
 			if (!response.ok) {
-				console.log('API Error:', data);
 				throw data as ApiError;
 			}
 
 			return data as T;
 		} catch (error) {
-			console.error('Request error:', error);
-
 			if (error instanceof TypeError) {
 				throw {
 					message: `Network error. Cannot connect to server at ${BASE_URL}. Please check your connection and ensure the backend server is running.`,

@@ -1,20 +1,19 @@
 // services/adminService.ts
-import Constants from 'expo-constants';
 import { AdminPaginationResponse, ApiError } from '../types/auth'; // Import the new types
 
-const getBaseUrl = () => {
-	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+// const getBaseUrl = () => {
+// 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
 
-	if (__DEV__) {
-		if (debuggerHost) {
-			return `http://${debuggerHost}:5000`;
-		}
-		return 'http://192.168.137.156:5000'; // Your machine's IP address
-	}
-	return 'https://your-production-api.com';
-};
+// 	if (__DEV__) {
+// 		if (debuggerHost) {
+// 			return `http://${debuggerHost}:5000`;
+// 		}
+// 		return 'http://192.168.137.156:5000'; // Your machine's IP address
+// 	}
+// 	return 'https://your-production-api.com';
+// };
 
-const BASE_URL = getBaseUrl();
+const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class AdminServiceClass {
 	private async makeRequest<T>(
@@ -23,8 +22,6 @@ class AdminServiceClass {
 		token?: string,
 	): Promise<T> {
 		try {
-			console.log(`Making request to: ${BASE_URL}${endpoint}`);
-
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
 				...options,
 				headers: {
