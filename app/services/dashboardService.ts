@@ -1,6 +1,5 @@
-// services/adminService.ts
 import Constants from 'expo-constants';
-import { AdminPaginationResponse, ApiError } from '../types/auth'; // Import the new types
+import { ApiError, ProjectPaginationResponse } from '../types/auth';
 
 const getBaseUrl = () => {
 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
@@ -16,15 +15,13 @@ const getBaseUrl = () => {
 
 const BASE_URL = getBaseUrl();
 
-class AdminServiceClass {
+class DashboardServiceClass {
 	private async makeRequest<T>(
 		endpoint: string,
 		options: RequestInit = {},
 		token?: string,
 	): Promise<T> {
 		try {
-			console.log(`Making request to: ${BASE_URL}${endpoint}`);
-
 			const response = await fetch(`${BASE_URL}${endpoint}`, {
 				...options,
 				headers: {
@@ -35,6 +32,7 @@ class AdminServiceClass {
 			});
 
 			const data = await response.json();
+			console.log('Project', data);
 
 			if (!response.ok) {
 				throw data as ApiError;
@@ -53,26 +51,53 @@ class AdminServiceClass {
 		}
 	}
 
-	// Modified getAdmins to accept an optional query parameter
-	async getAdmins(
-		page: number,
-		limit: number,
-		query?: string, // New optional query parameter
-	): Promise<AdminPaginationResponse> {
+	async getProject(
+		adminId: string,
+		page: number = 1,
+		limit: number = 10,
+		token: string,
+	): Promise<ProjectPaginationResponse> {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString(),
 		});
 
-		if (query) {
-			queryParams.append('query', query); // Append the query parameter
-		}
-
-		return this.makeRequest<AdminPaginationResponse>(
-			`/api/users/admins?${queryParams.toString()}`,
+		return this.makeRequest<ProjectPaginationResponse>(
+			`/api/projects/assigned/${adminId}?${queryParams.toString()}`,
 			{ method: 'GET' },
+			token,
+		);
+	}
+
+	async acceptProject(
+		projectId: string,
+		token: string,
+	): Promise<{
+		message: string;
+		project: any;
+		user: any;
+	}> {
+		return this.makeRequest(
+			`/api/projects/accept/${projectId}`,
+			{
+				method: 'PUT',
+			},
+			token,
+		);
+	}
+
+	async deleteProject(
+		projectId: string,
+		token: string,
+	): Promise<{ message: string }> {
+		return this.makeRequest(
+			`/api/projects/${projectId}`,
+			{
+				method: 'DELETE',
+			},
+			token,
 		);
 	}
 }
 
-export const AdminService = new AdminServiceClass();
+export const DashboardService = new DashboardServiceClass();

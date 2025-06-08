@@ -1,5 +1,5 @@
 export interface User {
-	id: string;
+	_id: string;
 	name: string;
 	email: string;
 	matricNumber?: string;
@@ -117,6 +117,35 @@ export interface Admin {
 // Define the structure of the successful response from getAdmins
 export interface AdminPaginationResponse {
 	admins: Admin[];
+	pagination: {
+		totalCount: number;
+		totalPages: number;
+		currentPage: number;
+		limit: number;
+	};
+}
+
+export interface Project {
+	_id: string;
+	studentId: string;
+	studentName: string;
+	matricNumber: string;
+	fileUrl: string;
+	title: string;
+	assignedAdmin: string;
+	status: 'pending' | 'accepted' | 'rejected';
+	fileType: string;
+	pageCount: number;
+	price: number;
+	originalPrice: number;
+	discountPercentage: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+// Define the structure of the successful response from getProject
+export interface ProjectPaginationResponse {
+	projects: Project[];
 	pagination: {
 		totalCount: number;
 		totalPages: number;

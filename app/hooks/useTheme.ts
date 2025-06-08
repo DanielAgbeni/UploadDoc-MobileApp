@@ -29,6 +29,20 @@ export const useTheme = () => {
 				'bg-light-button-primary-bg',
 				'bg-dark-button-primary-bg',
 			),
+			// New Dashboard specific backgrounds
+			'button-accept': getThemedClassName(
+				'bg-light-button-accept-bg',
+				'bg-dark-button-accept-bg',
+			),
+			'button-delete': getThemedClassName(
+				'bg-light-button-delete-bg',
+				'bg-dark-button-delete-bg',
+			),
+			'button-download': getThemedClassName(
+				'bg-light-button-download-bg',
+				'bg-dark-button-download-bg',
+			),
+			input: getThemedClassName('bg-light-input-bg', 'bg-dark-input-bg'),
 		},
 		text: {
 			primary: getThemedClassName('text-light-primary', 'text-dark-primary'),
@@ -53,7 +67,28 @@ export const useTheme = () => {
 			'on-secondary': getThemedClassName(
 				'text-light-on-secondary',
 				'text-dark-on-secondary',
-			), // Added here
+			),
+			// New Dashboard specific texts
+			'on-button-accept': getThemedClassName(
+				'text-light-on-button-accept',
+				'text-dark-on-button-accept',
+			),
+			'on-button-delete': getThemedClassName(
+				'text-light-on-button-delete',
+				'text-dark-on-button-delete',
+			),
+			'on-button-download': getThemedClassName(
+				'text-light-on-button-download',
+				'text-dark-on-button-download',
+			),
+			input: getThemedClassName(
+				'text-light-input-text',
+				'text-dark-input-text',
+			),
+			'input-placeholder': getThemedClassName(
+				'text-light-input-placeholder',
+				'text-dark-input-placeholder',
+			),
 		},
 		border: {
 			primary: getThemedClassName(
@@ -69,11 +104,16 @@ export const useTheme = () => {
 				'border-light-border-card',
 				'border-dark-border-card',
 			),
+			// New Dashboard specific borders
+			input: getThemedClassName(
+				'border-light-input-border',
+				'border-dark-input-border',
+			),
 		},
 	};
 
 	return {
-		...context, // Now includes `colors` object
+		...context,
 		getThemedClassName,
 		getThemedStyle,
 		themed,

@@ -4,7 +4,6 @@ import { useColorScheme } from 'react-native';
 
 type ColorScheme = 'light' | 'dark';
 
-// Define the structure of the colors object, matching your tailwind config
 interface ThemeColors {
 	text: string;
 	background: string;
@@ -17,7 +16,18 @@ interface ThemeColors {
 	'button-primary-bg': string;
 	'on-button-primary': string;
 	'rating-star': string;
-	'on-secondary': string; // Added here
+	'on-secondary': string;
+	// New Dashboard specific colors
+	'button-accept-bg': string;
+	'on-button-accept': string;
+	'button-delete-bg': string;
+	'on-button-delete': string;
+	'button-download-bg': string;
+	'on-button-download': string;
+	'input-bg': string;
+	'input-text': string;
+	'input-border': string;
+	'input-placeholder': string;
 }
 
 interface ThemeContextType {
@@ -26,8 +36,6 @@ interface ThemeContextType {
 	isDark: boolean;
 }
 
-// These direct color definitions are duplicates of tailwind.config.js
-// but are necessary for native component props that expect direct color values.
 const lightColors: ThemeColors = {
 	text: '#090b1b',
 	background: '#ebf4ff',
@@ -41,6 +49,16 @@ const lightColors: ThemeColors = {
 	'on-button-primary': '#ffffff',
 	'rating-star': '#FFD700',
 	'on-secondary': '#ffffff',
+	'button-accept-bg': '#28a745',
+	'on-button-accept': '#ffffff',
+	'button-delete-bg': '#dc3545',
+	'on-button-delete': '#ffffff',
+	'button-download-bg': '#007bff',
+	'on-button-download': '#ffffff',
+	'input-bg': '#ffffff',
+	'input-text': '#090b1b',
+	'input-border': '#cccccc',
+	'input-placeholder': '#999999',
 };
 
 const darkColors: ThemeColors = {
@@ -56,6 +74,16 @@ const darkColors: ThemeColors = {
 	'on-button-primary': '#ffffff',
 	'rating-star': '#FFD700',
 	'on-secondary': '#ffffff',
+	'button-accept-bg': '#218838',
+	'on-button-accept': '#ffffff',
+	'button-delete-bg': '#c82333',
+	'on-button-delete': '#ffffff',
+	'button-download-bg': '#0056b3',
+	'on-button-download': '#ffffff',
+	'input-bg': '#0d1a2b',
+	'input-text': '#e4e6f6',
+	'input-border': '#3a3a5a',
+	'input-placeholder': '#888888',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -73,7 +101,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
 	const value: ThemeContextType = {
 		colorScheme,
-		colors, // Now part of the context value
+		colors,
 		isDark,
 	};
 
