@@ -26,26 +26,24 @@ const HomeScreen = () => {
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
 
-	// Define a default font class to apply to all text components
-	const defaultFontClass = 'font-inter'; // Ensure 'Inter' font is loaded in your app
+	const defaultFontClass = 'font-inter';
 
 	const fetchDocuments = useCallback(
 		async (pageNum: number) => {
 			if (!user || !token) return;
 
 			try {
-				setIsLoading(!isRefreshing); // Only show full loader if not refreshing
+				setIsLoading(!isRefreshing);
 				const response = await DocumentService.getUserDocuments(
 					user._id,
 					pageNum,
-					10, // Assuming 10 items per page
+					10,
 					token,
 				);
 				setDocuments(response.projects);
 				setTotalPages(response.pagination.totalPages);
 			} catch (err) {
 				console.error('Error fetching documents:', err);
-				// Optionally set an error state to display to the user
 			} finally {
 				setIsLoading(false);
 				setIsRefreshing(false);
@@ -88,7 +86,7 @@ const HomeScreen = () => {
 
 	const handleRefresh = useCallback(() => {
 		setIsRefreshing(true);
-		setPage(1); // Reset to first page on refresh
+		setPage(1);
 		fetchDocuments(1);
 	}, [fetchDocuments]);
 
@@ -100,145 +98,225 @@ const HomeScreen = () => {
 	};
 
 	const renderDocumentItem = ({ item }: { item: Project }) => (
-		<View
-			className={`
-    p-5 mb-4 rounded-xl border-2 shadow-md
-    ${themed.bg.card} ${themed.border.card}
-  `}>
+		<View className={`p-5 mb-6 rounded-2xl shadow-lg ${themed.bg.card}`}>
 			{/* Title */}
 			<Text
-				className={`text-xl font-bold mb-3 ${themed.text.text} ${defaultFontClass}`}>
+				className={`text-2xl font-bold mb-4 ${themed.text.text} ${defaultFontClass}`}
+				numberOfLines={1}
+				ellipsizeMode='tail'>
 				{item.title}
 			</Text>
 
-			{/* Status Badge */}
-			<View className='flex-row items-center mb-3'>
-				<View
-					className={`px-3 py-1 rounded-full ${
-						item.status === 'accepted'
-							? 'bg-green-500'
-							: item.status === 'pending'
-							? 'bg-yellow-500'
-							: 'bg-red-500'
-					}`}>
-					<Text className={`text-white text-sm capitalize ${defaultFontClass}`}>
-						{item.status}
+			{/* Student Info & Pages */}
+			<View className='flex-row justify-between items-center mb-3'>
+				<Text
+					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
+					numberOfLines={1}
+					ellipsizeMode='tail'>
+					Student: {item.studentName}
+				</Text>
+				<Text
+					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
+					numberOfLines={1}
+					ellipsizeMode='tail'>
+					Pages: {item.pageCount}
+				</Text>
+			</View>
+
+			{/* Price */}
+			{item.price && (
+				<View className='flex-row justify-between items-center mb-3'>
+					<Text
+						className={`text-lg font-semibold ${themed.text.text} ${defaultFontClass}`}
+						numberOfLines={1}
+						ellipsizeMode='tail'>
+						₦{item.price}
 					</Text>
+					{item.discountPercentage > 0 && (
+						<Text
+							className={`text-base ${themed.text.text} ${defaultFontClass}`}
+							numberOfLines={1}
+							ellipsizeMode='tail'>
+							Discount: {item.discountPercentage}%
+						</Text>
+					)}
+				</View>
+			)}
+
+			{/* Status & Discount */}
+			<View className='flex-row justify-between items-center mb-3 flex-wrap gap-y-2'>
+				{/* Status */}
+				<View className='flex-row items-center'>
+					<Text
+						className={`text-base mr-2 ${themed.text.text} ${defaultFontClass}`}
+						numberOfLines={1}
+						ellipsizeMode='tail'>
+						Status:
+					</Text>
+					<View
+						className={`px-3 py-1 rounded-full ${
+							item.status === 'accepted'
+								? 'bg-green-500'
+								: item.status === 'pending'
+								? 'bg-yellow-500'
+								: 'bg-red-500'
+						}`}>
+						<Text
+							className={`text-white text-sm capitalize ${defaultFontClass}`}
+							numberOfLines={1}
+							ellipsizeMode='tail'>
+							{item.status}
+						</Text>
+					</View>
+				</View>
+
+				<View className='flex-row justify-end mt-4'>
+					<TouchableOpacity
+						onPress={() => handleDeleteProject(item._id)}
+						className={`px-4 py-2 rounded-lg ${themed.bg['button-delete']}`}>
+						<Text
+							className={`text-sm font-medium ${themed.text['on-button-delete']} ${defaultFontClass}`}
+							numberOfLines={1}
+							ellipsizeMode='tail'>
+							Delete
+						</Text>
+					</TouchableOpacity>
 				</View>
 			</View>
 
-			{/* Detail Rows */}
-			<View className='mb-2'>
-				<Text
-					className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
-					Pages: <Text className='font-medium'>{item.pageCount}</Text>
-				</Text>
-				<Text
-					className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
-					Price: <Text className='font-medium'>₦{item.price}</Text>
-				</Text>
-
-				{item.discountPercentage > 0 && (
-					<Text className={`${themed.text['card-detail']} ${defaultFontClass}`}>
-						Discount Applied:{' '}
-						<Text className='font-medium'>{item.discountPercentage}%</Text>
-					</Text>
-				)}
-			</View>
-
-			{/* Action Button */}
-			<TouchableOpacity
-				onPress={() => handleDeleteProject(item._id)}
-				className={`mt-3 px-4 py-2 rounded-lg self-start ${themed.bg['button-delete']}`}>
-				<Text
-					className={`${themed.text['on-button-delete']} font-medium ${defaultFontClass}`}
-					numberOfLines={1}
-					ellipsizeMode='tail'>
-					Delete
-				</Text>
-			</TouchableOpacity>
+			{/* Actions */}
 		</View>
 	);
 
 	return (
 		<View className={`flex-1 ${themed.bg.background}`}>
-			{/* Header */}
-			<View className={`items-center mt-6 px-6 pt-16 pb-8`}>
-				<Image
-					source={icons.logo}
-					className='w-24 h-24 mb-6 rounded-lg' // Added rounded-lg
-					resizeMode='contain'
-				/>
-				<Text
-					className={`text-4xl font-extrabold mb-3 text-center ${themed.text.primary} ${defaultFontClass}`}>
-					UploadDoc
-				</Text>
-				<Text
-					className={`text-xl text-center mb-6 ${themed.text.text} ${defaultFontClass}`}>
-					Simplify Your Document Management
-				</Text>
-			</View>
-
-			{/* Submit Document Button */}
-			<TouchableOpacity
-				onPress={() => navigateToUpload()}
-				className={`
-					mx-6 mb-8 p-4 rounded-xl shadow-lg
-					${themed.bg.primary} flex-row items-center justify-center
-				`}>
-				<Image
-					source={icons.upload}
-					className='w-7 h-7 mr-3'
-					tintColor={colors['on-button-primary']} // Use direct color for tint
-				/>
-				<Text
-					className={`text-xl font-bold ${themed.text['on-button-primary']} ${defaultFontClass}`}>
-					Submit Document
-				</Text>
-			</TouchableOpacity>
-
-			{/* Submitted Documents Heading */}
-			<Text
-				className={`text-2xl font-bold mx-6 mb-4 ${themed.text.text} ${defaultFontClass}`}>
-				Submitted Documents
-			</Text>
-
-			{/* Documents List */}
-			{isLoading && !isRefreshing ? (
-				<View className='flex-1 justify-center items-center'>
-					<ActivityIndicator
-						size='large'
-						color={colors.primary}
+			{/* Modern Header with User Info */}
+			<View className={`pt-12 px-6 pb-4 rounded-b-2xl ${themed.bg.primary}`}>
+				<View className='flex-row justify-between items-center mb-6'>
+					<Image
+						source={icons.logo}
+						className='w-14 h-14 rounded-lg'
+						resizeMode='contain'
 					/>
-					<Text className={`mt-4 ${themed.text.text} ${defaultFontClass}`}>
-						Loading documents...
-					</Text>
-				</View>
-			) : (
-				<FlatList
-					data={documents}
-					renderItem={renderDocumentItem}
-					keyExtractor={(item) => item._id}
-					className='px-6' // Changed to px-6 for consistency
-					showsVerticalScrollIndicator={false}
-					refreshControl={
-						<RefreshControl
-							refreshing={isRefreshing}
-							onRefresh={handleRefresh}
-							colors={[colors.primary]}
-							tintColor={colors.primary}
-						/>
-					}
-					ListEmptyComponent={
-						<View className='flex-1 items-center justify-center p-4'>
+
+					{user && (
+						<View className='flex-row items-center'>
+							<View
+								className={`w-10 h-10 rounded-full ${themed.bg.secondary} items-center justify-center mr-2`}>
+								<Text
+									className={`text-3xl font-bold ${themed.text['on-button-primary']}`}>
+									{user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+								</Text>
+							</View>
 							<Text
-								className={`text-lg text-center ${themed.text.text} ${defaultFontClass}`}>
-								No documents found. Submit your first document!
+								className={`text-xl ${themed.text['on-button-primary']} ${defaultFontClass}`}>
+								{user.name || 'User'}
 							</Text>
 						</View>
-					}
-				/>
-			)}
+					)}
+				</View>
+
+				<View className='mb-6'>
+					<Text
+						className={`text-4xl font-bold ${themed.text['on-button-primary']} ${defaultFontClass}`}>
+						Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''}!
+					</Text>
+					<Text
+						className={`text-lg font-bold ${themed.text['on-button-primary']} ${defaultFontClass}`}>
+						Manage your documents efficiently
+					</Text>
+				</View>
+			</View>
+
+			{/* Content Area */}
+			<View className='flex-1 px-6 pt-4'>
+				{/* Quick Action Button */}
+				<TouchableOpacity
+					onPress={() => navigateToUpload()}
+					className={`
+            mb-6 p-4 rounded-xl shadow-lg
+            ${themed.bg.primary} flex-row items-center justify-between
+          `}
+					style={{
+						shadowColor: colors.primary,
+						shadowOffset: { width: 0, height: 4 },
+						shadowOpacity: 0.2,
+						shadowRadius: 8,
+						elevation: 6,
+					}}>
+					<View className='flex-row items-center'>
+						<Image
+							source={icons.upload}
+							className='w-6 h-6 mr-3'
+							tintColor={colors['on-button-primary']}
+						/>
+						<Text
+							className={`text-lg font-bold ${themed.text['on-button-primary']} ${defaultFontClass}`}>
+							Submit New Document
+						</Text>
+					</View>
+					<Image
+						source={icons.arrowForward}
+						className='w-5 h-5'
+						tintColor={colors['on-button-primary']}
+					/>
+				</TouchableOpacity>
+
+				{/* Documents Section */}
+				<View className='flex-row justify-between items-center mb-4'>
+					<Text
+						className={`text-xl font-bold ${themed.text.text} ${defaultFontClass}`}>
+						Your Documents
+					</Text>
+					<Text className={`text-base ${themed.text.text} ${defaultFontClass}`}>
+						{documents.length} document{documents.length > 1 ? 's' : ''}
+					</Text>
+				</View>
+
+				{isLoading && !isRefreshing ? (
+					<View className='flex-1 justify-center items-center'>
+						<ActivityIndicator
+							size='large'
+							color={colors.primary}
+						/>
+						<Text className={`mt-4 ${themed.text.text} ${defaultFontClass}`}>
+							Loading documents...
+						</Text>
+					</View>
+				) : (
+					<FlatList
+						data={documents}
+						renderItem={renderDocumentItem}
+						keyExtractor={(item) => item._id}
+						showsVerticalScrollIndicator={false}
+						refreshControl={
+							<RefreshControl
+								refreshing={isRefreshing}
+								onRefresh={handleRefresh}
+								colors={[colors.primary]}
+								tintColor={colors.primary}
+							/>
+						}
+						ListEmptyComponent={
+							<View className='flex-1 items-center justify-center p-4 mt-10'>
+								<Image
+									source={icons.document}
+									className='w-20 h-20 mb-4 opacity-50'
+									tintColor={colors.text}
+								/>
+								<Text
+									className={`text-lg text-center ${themed.text.text} ${defaultFontClass} mb-2`}>
+									No documents found
+								</Text>
+								<Text
+									className={`text-sm text-center ${themed.text.text} ${defaultFontClass}`}>
+									Submit your first document to get started
+								</Text>
+							</View>
+						}
+					/>
+				)}
+			</View>
 		</View>
 	);
 };

@@ -5,6 +5,7 @@ import check from '@/assets/icons/check.png';
 import close from '@/assets/icons/close.png';
 import darkModeIcon from '@/assets/icons/dark_mode.png';
 import dashboardIcon from '@/assets/icons/dashboard.png';
+import document from '@/assets/icons/document.png';
 import download from '@/assets/icons/download.png';
 import explore from '@/assets/icons/explore.png';
 import google from '@/assets/icons/google.png';
@@ -32,4 +33,5 @@ export const icons = {
 	logo,
 	google,
 	lock,
+	document,
 };

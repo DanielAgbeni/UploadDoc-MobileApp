@@ -188,7 +188,7 @@ export default function UploadDocumentScreen() {
 				</TouchableOpacity>
 
 				<Text
-					className={`text-4xl font-extrabold mb-8 ${themed.text.primary} ${defaultFontClass}`}>
+					className={`text-4xl font-extrabold mb-8 ${themed.text.text} ${defaultFontClass}`}>
 					Upload Document
 				</Text>
 

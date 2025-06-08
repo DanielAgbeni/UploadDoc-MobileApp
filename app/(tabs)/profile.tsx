@@ -117,12 +117,14 @@ const Profile = () => {
 					<Text className='text-white text-2xl font-bold mb-1'>
 						{user?.name || 'User'}
 					</Text>
-					<Text className='text-white/80 font-normal'>{user?.email}</Text>
+					<Text className='text-white/80 text-lg font-normal'>
+						{user?.email}
+					</Text>
 
 					<View
 						className={`mt-4 px-4 py-1 rounded-full ${getAccountTypeColor()} flex-row items-center`}>
 						<View className='w-2 h-2 bg-white rounded-full mr-2' />
-						<Text className='text-white text-sm font-semibold'>
+						<Text className='text-white text-lg font-semibold'>
 							{getAccountTypeText()}
 						</Text>
 					</View>

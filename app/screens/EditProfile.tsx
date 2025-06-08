@@ -282,10 +282,6 @@ const EditProfile = () => {
 								<Text className={`text-2xl font-bold ${themed.text.primary}`}>
 									Edit Profile
 								</Text>
-								<Text
-									className={`text-lg font-semibold ${themed.text.text} mt-1`}>
-									Update your provider information
-								</Text>
 							</View>
 						</View>
 					</View>
