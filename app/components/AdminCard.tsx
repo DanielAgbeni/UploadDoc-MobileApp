@@ -9,9 +9,10 @@ const AdminCard = ({ admin }: { admin: Admin }) => {
 	const { themed } = useTheme();
 
 	const handleSelectProvider = () => {
+		console.log('Selecting admin:', admin);
 		router.push({
-			pathname: '/screens/upload-document' as any,
-			params: { selectedAdmin: admin._id },
+			pathname: '/screens/upload-document',
+			params: { selectedAdmin: admin.name },
 		});
 	};
 

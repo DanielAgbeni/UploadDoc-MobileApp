@@ -18,15 +18,12 @@ import { AdminService } from '../services/adminService';
 import { DocumentService } from '../services/documentService';
 import { Admin } from '../types/auth';
 
-/**
- * Screen for uploading documents and selecting providers
- */
 export default function UploadDocumentScreen() {
 	const { themed, colors } = useTheme();
 	const { user, token } = useAuth();
 	const params = useLocalSearchParams();
 	const selectedAdminId = params.selectedAdmin as string;
-
+	const [adminResults, setAdminResults] = useState<Admin[]>([]);
 	const [title, setTitle] = useState('');
 	const [document, setDocument] =
 		useState<DocumentPicker.DocumentPickerResult | null>(null);
@@ -37,17 +34,30 @@ export default function UploadDocumentScreen() {
 	const defaultFontClass = 'font-inter';
 
 	useEffect(() => {
+		console.log('useEffect triggered with:', { selectedAdminId, token });
 		if (selectedAdminId && token) {
+			setIsLoading(true);
+			console.log('Fetching admin with ID:', selectedAdminId);
 			AdminService.getAdmins(1, 1, selectedAdminId)
 				.then((response) => {
-					if (response.admins.length > 0) {
+					console.log('Admin response:', response);
+					if (response.admins && response.admins.length > 0) {
 						setSelectedAdmin(response.admins[0]);
+						console.log('Admin loaded:', response.admins[0]);
+					} else {
+						console.log('No admin found in response');
+						Alert.alert('Error', 'Provider not found.');
 					}
 				})
 				.catch((error) => {
 					console.error('Error fetching admin details:', error);
 					Alert.alert('Error', 'Failed to load pre-selected provider.');
+				})
+				.finally(() => {
+					setIsLoading(false);
 				});
+		} else {
+			console.log('Missing required data:', { selectedAdminId, token });
 		}
 	}, [selectedAdminId, token]);
 
@@ -142,12 +152,8 @@ export default function UploadDocumentScreen() {
 						'No providers matched your search. Try a different term.',
 					);
 				} else {
-					const [firstAdmin] = response.admins;
-					setSelectedAdmin(firstAdmin);
-					Alert.alert(
-						'Provider Selected',
-						`Selected: ${firstAdmin.name}. You can change this below.`,
-					);
+					// Store all matched admins
+					setAdminResults(response.admins);
 				}
 			} catch (error: any) {
 				console.error('Error searching admins:', error);
@@ -186,10 +192,10 @@ export default function UploadDocumentScreen() {
 					Upload Document
 				</Text>
 
-				<View className='space-y-8'>
+				<View className='space-y-8 mb-8'>
 					<View>
 						<Text
-							className={`text-lg font-semibold mb-3 ${themed.text.text} ${defaultFontClass}`}>
+							className={`text-lg font-semibold mb-2 ${themed.text.text} ${defaultFontClass}`}>
 							Document Title
 						</Text>
 						<TextInput
@@ -203,30 +209,23 @@ export default function UploadDocumentScreen() {
 
 					<View>
 						<Text
-							className={`text-lg font-semibold mb-3 ${themed.text.text} ${defaultFontClass}`}>
-							Provider
+							className={`text-lg font-semibold mb-2 mt-5 ${themed.text.text} ${defaultFontClass}`}>
+							{selectedAdmin ? 'Selected Provider' : 'Provider'}
 						</Text>
-						{selectedAdmin ? (
+
+						{selectedAdmin && (
 							<View
-								className={`p-5 rounded-xl border-2 shadow-sm ${themed.bg.card} ${themed.border.card}`}>
-								<Text
-									className={`font-medium text-lg ${themed.text.text} ${defaultFontClass}`}>
+								className={`p-5 rounded-xl border-2 mb-3 shadow-sm ${themed.bg.card} ${themed.border.card}`}>
+								<Text className={`font-medium text-lg ${themed.text.text}`}>
 									{selectedAdmin.name}
 								</Text>
 								<Text
 									className={`${themed.text['card-detail']} mt-1 ${defaultFontClass}`}>
 									📍 {selectedAdmin.printingLocation || 'No location provided'}
 								</Text>
-								<TouchableOpacity
-									onPress={() => setSelectedAdmin(null)}
-									className='mt-3'>
-									<Text
-										className={`font-semibold ${themed.text.primary} ${defaultFontClass}`}>
-										Change Provider
-									</Text>
-								</TouchableOpacity>
 							</View>
-						) : (
+						)}
+						{!selectedAdmin && (
 							<View>
 								<TextInput
 									value={adminSearch}
@@ -237,12 +236,33 @@ export default function UploadDocumentScreen() {
 								/>
 								<TouchableOpacity
 									onPress={() => searchAdmins(adminSearch)}
-									className={`p-4 rounded-xl shadow-md ${themed.bg.secondary}`}>
+									className={`p-4 rounded-xl shadow-md mb-4 ${themed.bg.secondary}`}>
 									<Text
 										className={`text-lg font-semibold text-center ${themed.text['on-secondary']} ${defaultFontClass}`}>
 										Search Provider
 									</Text>
 								</TouchableOpacity>
+
+								{/* Admin Results */}
+								{adminResults.length > 0 && (
+									<View className='space-y-4'>
+										{adminResults.map((admin: Admin) => (
+											<TouchableOpacity
+												key={admin._id}
+												onPress={() => setSelectedAdmin(admin)}
+												className={`p-5 rounded-xl border-2 mb-3 shadow-sm ${themed.bg.card} ${themed.border.card}`}>
+												<Text
+													className={`font-medium text-lg ${themed.text.text} ${defaultFontClass}`}>
+													{admin.name}
+												</Text>
+												<Text
+													className={`${themed.text['card-detail']} mt-1 ${defaultFontClass}`}>
+													📍 {admin.printingLocation || 'No location provided'}
+												</Text>
+											</TouchableOpacity>
+										))}
+									</View>
+								)}
 							</View>
 						)}
 					</View>
@@ -276,7 +296,7 @@ export default function UploadDocumentScreen() {
 					<TouchableOpacity
 						onPress={uploadDocument}
 						disabled={isLoading}
-						className={`py-5 rounded-xl shadow-lg ${themed.bg.primary} ${
+						className={`py-5 rounded-xl mt-4 shadow-lg ${themed.bg.primary} ${
 							isLoading ? 'opacity-50' : ''
 						}`}>
 						{isLoading ? (
