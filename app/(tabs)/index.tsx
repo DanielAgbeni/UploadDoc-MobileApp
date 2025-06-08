@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
+	Alert,
 	FlatList,
 	Image,
 	RefreshControl,
@@ -12,6 +13,7 @@ import {
 import { icons } from '../../constants/icons';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../hooks/useTheme';
+import { DashboardService } from '../services/dashboardService';
 import { DocumentService } from '../services/documentService';
 import { Project } from '../types/auth';
 
@@ -56,6 +58,34 @@ const HomeScreen = () => {
 		fetchDocuments(page);
 	}, [fetchDocuments, page]);
 
+	const handleDeleteProject = async (projectId: string) => {
+		if (!token) return;
+
+		Alert.alert(
+			'Confirm Delete',
+			'Are you sure you want to delete this project?',
+			[
+				{ text: 'Cancel', style: 'cancel' },
+				{
+					text: 'Delete',
+					style: 'destructive',
+					onPress: async () => {
+						try {
+							setIsLoading(true);
+							await DashboardService.deleteProject(projectId, token);
+							Alert.alert('Success', 'Project deleted successfully');
+							await fetchDocuments(page);
+						} catch (err: any) {
+							Alert.alert('Error', err.message || 'Failed to delete project');
+						} finally {
+							setIsLoading(false);
+						}
+					},
+				},
+			],
+		);
+	};
+
 	const handleRefresh = useCallback(() => {
 		setIsRefreshing(true);
 		setPage(1); // Reset to first page on refresh
@@ -72,18 +102,21 @@ const HomeScreen = () => {
 	const renderDocumentItem = ({ item }: { item: Project }) => (
 		<View
 			className={`
-				p-5 mb-4 rounded-xl border-2 shadow-md
-				${themed.bg.card} ${themed.border.card}
-			`}>
+    p-5 mb-4 rounded-xl border-2 shadow-md
+    ${themed.bg.card} ${themed.border.card}
+  `}>
+			{/* Title */}
 			<Text
-				className={`text-lg font-bold mb-2 ${themed.text.text} ${defaultFontClass}`}>
+				className={`text-xl font-bold mb-3 ${themed.text.text} ${defaultFontClass}`}>
 				{item.title}
 			</Text>
-			<View className='flex-row items-center mb-1'>
+
+			{/* Status Badge */}
+			<View className='flex-row items-center mb-3'>
 				<View
-					className={`px-2 py-1 rounded-full ${
+					className={`px-3 py-1 rounded-full ${
 						item.status === 'accepted'
-							? 'bg-green-500' // Keep these direct for distinct status colors
+							? 'bg-green-500'
 							: item.status === 'pending'
 							? 'bg-yellow-500'
 							: 'bg-red-500'
@@ -93,19 +126,37 @@ const HomeScreen = () => {
 					</Text>
 				</View>
 			</View>
-			<Text
-				className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
-				Pages: {item.pageCount}
-			</Text>
-			<Text
-				className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
-				Price: ₦{item.price}
-			</Text>
-			{item.discountPercentage > 0 && (
-				<Text className={`${themed.text['card-detail']} ${defaultFontClass}`}>
-					Discount Applied: {item.discountPercentage}%
+
+			{/* Detail Rows */}
+			<View className='mb-2'>
+				<Text
+					className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
+					Pages: <Text className='font-medium'>{item.pageCount}</Text>
 				</Text>
-			)}
+				<Text
+					className={`${themed.text['card-detail']} mb-1 ${defaultFontClass}`}>
+					Price: <Text className='font-medium'>₦{item.price}</Text>
+				</Text>
+
+				{item.discountPercentage > 0 && (
+					<Text className={`${themed.text['card-detail']} ${defaultFontClass}`}>
+						Discount Applied:{' '}
+						<Text className='font-medium'>{item.discountPercentage}%</Text>
+					</Text>
+				)}
+			</View>
+
+			{/* Action Button */}
+			<TouchableOpacity
+				onPress={() => handleDeleteProject(item._id)}
+				className={`mt-3 px-4 py-2 rounded-lg self-start ${themed.bg['button-delete']}`}>
+				<Text
+					className={`${themed.text['on-button-delete']} font-medium ${defaultFontClass}`}
+					numberOfLines={1}
+					ellipsizeMode='tail'>
+					Delete
+				</Text>
+			</TouchableOpacity>
 		</View>
 	);
 

@@ -14,7 +14,6 @@ const AdminCard = ({ admin }: { admin: Admin }) => {
 			params: { selectedAdmin: admin._id },
 		});
 	};
-	console.log(admin._id);
 
 	return (
 		<View
