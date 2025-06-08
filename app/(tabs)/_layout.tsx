@@ -7,11 +7,11 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 import { useAuth } from '../context/AuthContext';
-import { useTab } from '../context/TabContext'; // <--- Import useTab
+import { useTab } from '../context/TabContext';
 import { useTheme } from '../hooks/useTheme';
 
 const TabIcon = ({ focused, icons, title }: any) => {
-	const { themed, colors } = useTheme();
+	const { themed, colors } = useTheme(); // Access both 'themed' (for classes) and 'colors' (for direct values)
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
@@ -30,11 +30,13 @@ const TabIcon = ({ focused, icons, title }: any) => {
 			}`}>
 			<Image
 				source={icons}
-				tintColor={focused ? '#ffffff' : colors.text}
+				// Use direct color values from 'colors' for tintColor
+				tintColor={focused ? colors['on-secondary'] : colors.text}
 				className='size-8'
 			/>
 			{focused && (
-				<Text className={`text-base font-semibold ml-2 text-white`}>
+				<Text
+					className={`text-base font-semibold ml-2 ${themed.text['on-secondary']}`}>
 					{title}
 				</Text>
 			)}
@@ -43,9 +45,8 @@ const TabIcon = ({ focused, icons, title }: any) => {
 };
 
 const _layout = () => {
-	const { colors } = useTheme();
+	const { colors, themed } = useTheme(); // Get both 'colors' (for direct values) and 'themed' (for classes)
 	const { user } = useAuth();
-	// Get lastActiveTab from your context
 	const { lastActiveTab, setLastActiveTab } = useTab();
 
 	// Determine the initial tab name based on the last active tab
@@ -68,7 +69,7 @@ const _layout = () => {
 					alignItems: 'center',
 				},
 				tabBarStyle: {
-					backgroundColor: colors.background,
+					backgroundColor: colors.background, // Use direct color value from 'colors'
 					height: 70,
 					position: 'fixed',
 					overflow: 'hidden',
@@ -76,11 +77,8 @@ const _layout = () => {
 			}}
 			screenListeners={{
 				tabPress: (e) => {
-					// Update the last active tab when a tab is pressed
-					// e.target will be something like "(tabs)/index-tab"
 					const routeName = e.target?.split('-')[0];
 					if (routeName) {
-						// Store the full path including '(tabs)/'
 						setLastActiveTab(routeName);
 					}
 				},

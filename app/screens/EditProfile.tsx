@@ -227,12 +227,6 @@ const EditProfile = () => {
 			await ProfileService.updateProfile(payload, token);
 			setMessage('Profile updated successfully');
 			setTimeout(() => setMessage(''), 5000);
-
-			// Refresh auth status to get updated user data (commented out to prevent navigation issues)
-			// await checkAuthStatus();
-
-			// Navigate back after successful update
-			// setTimeout(() => router.back(), 2000);
 		} catch (error: any) {
 			setError(error?.message || 'Error updating profile');
 		} finally {
@@ -281,13 +275,15 @@ const EditProfile = () => {
 									source={icons.arrowBack}
 									resizeMode='cover'
 									className='w-10 h-10'
+									tintColor={'#444ebb'}
 								/>
 							</TouchableOpacity>
 							<View>
-								<Text className={`text-2xl font-bold ${themed.text.text}`}>
+								<Text className={`text-2xl font-bold ${themed.text.primary}`}>
 									Edit Profile
 								</Text>
-								<Text className={`text-sm ${themed.text.text} mt-1`}>
+								<Text
+									className={`text-lg font-semibold ${themed.text.text} mt-1`}>
 									Update your provider information
 								</Text>
 							</View>
@@ -320,10 +316,10 @@ const EditProfile = () => {
 					{/* Basic Information Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
-						<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
+						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Basic Information
 						</Text>
-						<Text className={`text-sm ${themed.text.text} mb-6`}>
+						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
 							Essential details about your printing service
 						</Text>
 
@@ -400,10 +396,10 @@ const EditProfile = () => {
 					{/* Discount Rates Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
-						<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
+						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Discount Rates
 						</Text>
-						<Text className={`text-sm ${themed.text.text} mb-6`}>
+						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
 							Offer discounts based on page count
 						</Text>
 
@@ -492,10 +488,10 @@ const EditProfile = () => {
 					{/* Additional Information Section */}
 					<View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.primary}`}>
-						<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
+						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Additional Information
 						</Text>
-						<Text className={`text-sm ${themed.text.text} mb-6`}>
+						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
 							Any extra details about your service
 						</Text>
 

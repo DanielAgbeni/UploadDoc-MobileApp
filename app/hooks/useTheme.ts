@@ -1,10 +1,9 @@
+// hooks/useTheme.ts
 import { useTheme as useThemeContext } from '../context/ThemeContext';
 
-// Re-export the theme hook for easier imports
 export const useTheme = () => {
 	const context = useThemeContext();
 
-	// Helper function to get themed class names
 	const getThemedClassName = (
 		lightClass: string,
 		darkClass: string,
@@ -12,14 +11,11 @@ export const useTheme = () => {
 		return context.isDark ? darkClass : lightClass;
 	};
 
-	// Helper function to get themed styles
 	const getThemedStyle = (lightStyle: object, darkStyle: object): object => {
 		return context.isDark ? darkStyle : lightStyle;
 	};
 
-	// Utility to create themed classes for common patterns
 	const themed = {
-		// Background colors
 		bg: {
 			primary: getThemedClassName('bg-light-primary', 'bg-dark-primary'),
 			secondary: getThemedClassName('bg-light-secondary', 'bg-dark-secondary'),
@@ -28,8 +24,12 @@ export const useTheme = () => {
 				'bg-light-background',
 				'bg-dark-background',
 			),
+			card: getThemedClassName('bg-light-card-bg', 'bg-dark-card-bg'),
+			'button-primary': getThemedClassName(
+				'bg-light-button-primary-bg',
+				'bg-dark-button-primary-bg',
+			),
 		},
-		// Text colors
 		text: {
 			primary: getThemedClassName('text-light-primary', 'text-dark-primary'),
 			secondary: getThemedClassName(
@@ -38,8 +38,23 @@ export const useTheme = () => {
 			),
 			accent: getThemedClassName('text-light-accent', 'text-dark-accent'),
 			text: getThemedClassName('text-light-text', 'text-dark-text'),
+			'on-button-primary': getThemedClassName(
+				'text-light-on-button-primary',
+				'text-dark-on-button-primary',
+			),
+			'card-detail': getThemedClassName(
+				'text-light-card-detail-text',
+				'text-dark-card-detail-text',
+			),
+			'rating-star': getThemedClassName(
+				'text-light-rating-star',
+				'text-dark-rating-star',
+			),
+			'on-secondary': getThemedClassName(
+				'text-light-on-secondary',
+				'text-dark-on-secondary',
+			), // Added here
 		},
-		// Border colors
 		border: {
 			primary: getThemedClassName(
 				'border-light-primary',
@@ -50,11 +65,15 @@ export const useTheme = () => {
 				'border-dark-secondary',
 			),
 			accent: getThemedClassName('border-light-accent', 'border-dark-accent'),
+			card: getThemedClassName(
+				'border-light-border-card',
+				'border-dark-border-card',
+			),
 		},
 	};
 
 	return {
-		...context,
+		...context, // Now includes `colors` object
 		getThemedClassName,
 		getThemedStyle,
 		themed,

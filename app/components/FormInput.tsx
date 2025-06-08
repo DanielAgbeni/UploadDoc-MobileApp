@@ -34,7 +34,7 @@ export const FormInput: React.FC<FormInputProps> = ({
 
 	return (
 		<View className='mb-4'>
-			<Text className={`text-sm font-medium mb-2 ${themed.text.primary}`}>
+			<Text className={`text-lg font-medium mb-2 ${themed.text.primary}`}>
 				{label}
 			</Text>
 
@@ -54,7 +54,7 @@ export const FormInput: React.FC<FormInputProps> = ({
 					onBlur={() => setIsFocused(false)}
 					className={`
             w-full px-4 py-3 rounded-lg border text-base
-            ${themed.text.primary}
+            ${themed.text.text}
             ${disabled ? 'opacity-50' : ''}
             ${multiline ? 'min-h-[100px]' : ''}
             ${
