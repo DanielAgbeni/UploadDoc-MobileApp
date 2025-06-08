@@ -10,8 +10,7 @@ const AdminCard = ({ admin }: { admin: any }) => {
 		<View
 			className={`
 				rounded-xl p-4 mb-4
-				${themed.bg.card}                 
-				${themed.border.card} border-2    
+				${themed.bg.card}                  
 				shadow-md dark:shadow-lg
 			`}>
 			<Text className={`text-2xl font-semibold mb-1 ${themed.text.text}`}>

@@ -315,7 +315,7 @@ const EditProfile = () => {
 					)}
 					{/* Basic Information Section */}
 					<View
-						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
+						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
 						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Basic Information
 						</Text>
@@ -395,7 +395,7 @@ const EditProfile = () => {
 					</View> */}
 					{/* Discount Rates Section */}
 					<View
-						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
+						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
 						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Discount Rates
 						</Text>
@@ -487,7 +487,7 @@ const EditProfile = () => {
 					</View>
 					{/* Additional Information Section */}
 					<View
-						className={`${themed.bg.background} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.primary}`}>
+						className={`${themed.bg.card} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.card}`}>
 						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
 							Additional Information
 						</Text>

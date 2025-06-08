@@ -65,8 +65,7 @@ const Profile = () => {
 	};
 
 	const ProfileCard = ({ title, value, icon }: any) => (
-		<View
-			className={`${themed.bg.background} border ${themed.border.primary} rounded-2xl p-5 mb-4 shadow-sm`}>
+		<View className={`${themed.bg.card} rounded-2xl p-5 mb-4 shadow-sm`}>
 			<View className='flex-row items-center mb-1'>
 				<Text className='text-lg mr-2'>{icon}</Text>
 				<Text className={`text-xs uppercase font-semibold ${themed.text.text}`}>
@@ -213,8 +212,7 @@ const Profile = () => {
 				)}
 
 				{/* Document Token */}
-				<View
-					className={`${themed.bg.background} border ${themed.border.primary} rounded-2xl p-5 mb-6 shadow-sm`}>
+				<View className={`${themed.bg.card} rounded-2xl p-5 mb-6 shadow-sm`}>
 					<View className='flex-row items-center mb-2'>
 						<Text className='text-lg mr-2'>🔑</Text>
 						<Text
@@ -250,7 +248,7 @@ const Profile = () => {
 						<TouchableOpacity
 							key={index}
 							onPress={item.onPress}
-							className={`${themed.bg.background} border ${themed.border.primary} flex-row items-center justify-between p-4 rounded-xl`}>
+							className={`${themed.bg.card} border ${themed.border.card} flex-row items-center justify-between p-4 rounded-xl`}>
 							<View className='flex-row items-center'>
 								<Text className='text-lg mr-3'>{item.icon}</Text>
 								<Text className={`text-base font-medium ${themed.text.text}`}>
