@@ -1,87 +1,86 @@
 {
-  "expo": {
-    "name": "UploadDoc",
-    "slug": "uploaddoc",
-    "version": "1.0.2",
-    "orientation": "",
-    "icon": "./assets/images/icon.png",
-    "scheme": "uploaddocmobile",
-    "deepLinking": {
-      "enabled": true,
-      "prefixes": [
-        "uploaddocmobile://"
-      ]
-    },
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "UIFileSharingEnabled": true,
-        "LSSupportsOpeningDocumentsInPlace": true,
-        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos for saving documents.",
-        "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save documents to your photo library."
-      },
-      "usesIcloudStorage": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#444ebb"
-      },
-      "edgeToEdgeEnabled": true,
-      "permissions": [
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.ACCESS_MEDIA_LOCATION",
-        "android.permission.INTERNET"
-      ],
-      "package": "com.yourcompany.uploaddoc"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/icon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ebf4ff",
-          "dark": {
-            "backgroundColor": "#000914"
-          }
-        }
-      ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos for document storage.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save documents to your photo library.",
-          "isAccessMediaLocationEnabled": true
-        }
-      ],
-      [
-        "expo-file-system",
-        {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos for document operations.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save documents."
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "extra": {
-      "eas": {
-        "projectId": "e0b0da12-467e-4d8e-a639-59c521504dfc"
-      },
-      "router": {}
-    },
-    "owner": "danielagbeni"
-  }
+	"expo": {
+		"name": "UploadDoc",
+		"slug": "uploaddoc",
+		"version": "1.0.2",
+		"orientation": "",
+		"icon": "./assets/images/icon.png",
+		"scheme": "uploaddocmobile",
+		"deepLinking": {
+			"enabled": true,
+			"prefixes": ["uploaddocmobile://"]
+		},
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"ios": {
+			"supportsTablet": true,
+			"infoPlist": {
+				"UIFileSharingEnabled": true,
+				"LSSupportsOpeningDocumentsInPlace": true,
+				"NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos for saving documents.",
+				"NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save documents to your photo library."
+			},
+			"usesIcloudStorage": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/icon.png",
+				"backgroundColor": "#444ebb"
+			},
+			"edgeToEdgeEnabled": true,
+			"enablePngCrunchInReleaseBuilds": false,
+			"permissions": [
+				"android.permission.READ_EXTERNAL_STORAGE",
+				"android.permission.WRITE_EXTERNAL_STORAGE",
+				"android.permission.ACCESS_MEDIA_LOCATION",
+				"android.permission.INTERNET"
+			],
+			"package": "com.danielagbeni.uploaddoc"
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/icon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/images/icon.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgroundColor": "#ebf4ff",
+					"dark": {
+						"backgroundColor": "#000914"
+					}
+				}
+			],
+			[
+				"expo-media-library",
+				{
+					"photosPermission": "Allow $(PRODUCT_NAME) to access your photos for document storage.",
+					"savePhotosPermission": "Allow $(PRODUCT_NAME) to save documents to your photo library.",
+					"isAccessMediaLocationEnabled": true
+				}
+			],
+			[
+				"expo-file-system",
+				{
+					"photosPermission": "Allow $(PRODUCT_NAME) to access your photos for document operations.",
+					"savePhotosPermission": "Allow $(PRODUCT_NAME) to save documents."
+				}
+			]
+		],
+		"experiments": {
+			"typedRoutes": true
+		},
+		"extra": {
+			"eas": {
+				"projectId": "e0b0da12-467e-4d8e-a639-59c521504dfc"
+			},
+			"router": {}
+		},
+		"owner": "danielagbeni"
+	}
 }

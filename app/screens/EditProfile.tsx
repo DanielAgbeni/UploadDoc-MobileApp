@@ -4,13 +4,16 @@ import {
 	ActivityIndicator,
 	Alert,
 	Image,
-	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
 	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import {
+	KeyboardAwareScrollView,
+	KeyboardToolbar,
+} from 'react-native-keyboard-controller';
 import { icons } from '../../constants/icons';
 import { AuthButton } from '../components/auth/AuthButton';
 import { FormInput } from '../components/FormInput';
@@ -246,98 +249,101 @@ const EditProfile = () => {
 	}
 
 	return (
-		<KeyboardAvoidingView
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			className='flex-1'
-			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
-			<ScrollView
-				className={`flex-1 ${themed.bg.background}`}
-				contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
-				keyboardShouldPersistTaps='handled'
-				showsVerticalScrollIndicator={false}
-				automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}>
-				{/* Header Section */}
-				<View
-					className={`${themed.bg.background} border-b ${themed.border.primary} mt-3 pb-4 pt-12 px-6 shadow-sm`}>
-					<View className='flex-row items-center justify-between'>
-						<View className='flex-row items-center flex-1'>
-							<TouchableOpacity
-								onPress={() => router.back()}
-								className={`w-10 h-10 rounded-full ${themed.bg.background} items-center justify-center mr-3 shadow-sm`}>
-								<Image
-									source={icons.arrowBack}
-									resizeMode='cover'
-									className='w-10 h-10'
-									tintColor={'#444ebb'}
-								/>
-							</TouchableOpacity>
-							<View>
-								<Text className={`text-2xl font-bold ${themed.text.primary}`}>
-									Edit Profile
-								</Text>
-							</View>
-						</View>
-					</View>
-				</View>
-
-				<View className='flex-1 px-6 py-6'>
-					{/* Success/Error Messages */}
-					{message && (
-						<View className='mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 shadow-sm'>
-							<View className='flex-row items-center'>
-								<View className='w-2 h-2 bg-emerald-500 rounded-full mr-3' />
-								<Text className='text-emerald-700 dark:text-emerald-300 font-medium flex-1'>
-									{message}
-								</Text>
-							</View>
-						</View>
-					)}
-					{error && (
-						<View className='mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 shadow-sm'>
-							<View className='flex-row items-center'>
-								<View className='w-2 h-2 bg-red-500 rounded-full mr-3' />
-								<Text className='text-red-700 dark:text-red-300 font-medium flex-1'>
-									{error}
-								</Text>
-							</View>
-						</View>
-					)}
-					{/* Basic Information Section */}
+		<>
+			<KeyboardAwareScrollView
+				bottomOffset={62}
+				className='flex-1'>
+				<ScrollView
+					className={`flex-1 ${themed.bg.background}`}
+					contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
+					keyboardShouldPersistTaps='handled'
+					showsVerticalScrollIndicator={false}
+					automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}>
+					{/* Header Section */}
 					<View
-						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
-						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
-							Basic Information
-						</Text>
-						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
-							Essential details about your printing service
-						</Text>
-
-						<View className='space-y-4'>
-							<FormInput
-								label='Printing Cost (per page)'
-								value={profile.printingCost}
-								onChangeText={(text) => handleChange('printingCost', text)}
-								placeholder='e.g., ₦10 per page'
-							/>
-
-							<FormInput
-								label='Printing Location'
-								value={profile.printingLocation}
-								onChangeText={(text) => handleChange('printingLocation', text)}
-								placeholder='e.g., Main Library, Ground Floor'
-							/>
-
-							<FormInput
-								label='Support Contact'
-								value={profile.supportContact}
-								onChangeText={(text) => handleChange('supportContact', text)}
-								placeholder='e.g., +234 123 456 7890'
-								keyboardType='phone-pad'
-							/>
+						className={`${themed.bg.background} border-b ${themed.border.primary} mt-3 pb-4 pt-12 px-6 shadow-sm`}>
+						<View className='flex-row items-center justify-between'>
+							<View className='flex-row items-center flex-1'>
+								<TouchableOpacity
+									onPress={() => router.back()}
+									className={`w-10 h-10 rounded-full ${themed.bg.background} items-center justify-center mr-3 shadow-sm`}>
+									<Image
+										source={icons.arrowBack}
+										resizeMode='cover'
+										className='w-10 h-10'
+										tintColor={'#444ebb'}
+									/>
+								</TouchableOpacity>
+								<View>
+									<Text className={`text-2xl font-bold ${themed.text.primary}`}>
+										Edit Profile
+									</Text>
+								</View>
+							</View>
 						</View>
 					</View>
 
-					{/* <View
+					<View className='flex-1 px-6 py-6'>
+						{/* Success/Error Messages */}
+						{message && (
+							<View className='mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 shadow-sm'>
+								<View className='flex-row items-center'>
+									<View className='w-2 h-2 bg-emerald-500 rounded-full mr-3' />
+									<Text className='text-emerald-700 dark:text-emerald-300 font-medium flex-1'>
+										{message}
+									</Text>
+								</View>
+							</View>
+						)}
+						{error && (
+							<View className='mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 shadow-sm'>
+								<View className='flex-row items-center'>
+									<View className='w-2 h-2 bg-red-500 rounded-full mr-3' />
+									<Text className='text-red-700 dark:text-red-300 font-medium flex-1'>
+										{error}
+									</Text>
+								</View>
+							</View>
+						)}
+						{/* Basic Information Section */}
+						<View
+							className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
+							<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
+								Basic Information
+							</Text>
+							<Text
+								className={`text-base font-medium ${themed.text.text} mb-6`}>
+								Essential details about your printing service
+							</Text>
+
+							<View className='space-y-4'>
+								<FormInput
+									label='Printing Cost (per page)'
+									value={profile.printingCost}
+									onChangeText={(text) => handleChange('printingCost', text)}
+									placeholder='e.g., ₦10 per page'
+								/>
+
+								<FormInput
+									label='Printing Location'
+									value={profile.printingLocation}
+									onChangeText={(text) =>
+										handleChange('printingLocation', text)
+									}
+									placeholder='e.g., Main Library, Ground Floor'
+								/>
+
+								<FormInput
+									label='Support Contact'
+									value={profile.supportContact}
+									onChangeText={(text) => handleChange('supportContact', text)}
+									placeholder='e.g., +234 123 456 7890'
+									keyboardType='phone-pad'
+								/>
+							</View>
+						</View>
+
+						{/* <View
 						className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
 						<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
 							Operating Hours
@@ -382,130 +388,134 @@ const EditProfile = () => {
 							</View>
 						)}
 					</View> */}
-					{/* Discount Rates Section */}
-					<View
-						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
-						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
-							Discount Rates
-						</Text>
-						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
-							Offer discounts based on page count
-						</Text>
-
-						{/* Existing Discount Rates */}
-						{profile.discountRates.length > 0 && (
-							<View className='mb-6'>
-								<Text
-									className={`text-sm font-semibold ${themed.text.text} mb-3`}>
-									Current Discounts
-								</Text>
-								{profile.discountRates.map((discount, index) => (
-									<View
-										key={index}
-										className={`${themed.bg.background} border-2 ${themed.border.primary} rounded-xl p-4 mb-3 flex-row justify-between items-center`}>
-										<View className='flex-1'>
-											<Text
-												className={`text-base font-medium ${themed.text.text}`}>
-												{discount.minPages}-{discount.maxPages} pages
-											</Text>
-											<Text className={`text-sm ${themed.text.secondary}`}>
-												{discount.discount}% discount
-											</Text>
-										</View>
-										<TouchableOpacity
-											onPress={() => removeDiscountRate(index)}
-											className='bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-sm'>
-											<Text className='text-white text-sm font-medium'>
-												Remove
-											</Text>
-										</TouchableOpacity>
-									</View>
-								))}
-							</View>
-						)}
-
-						{/* Add New Discount Rate */}
+						{/* Discount Rates Section */}
 						<View
-							className={`${themed.bg.background} border-2 border-dashed ${themed.border.primary} rounded-xl p-5`}>
-							<Text
-								className={`text-sm font-semibold ${themed.text.text} mb-4`}>
-								Add New Discount Rate
+							className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
+							<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
+								Discount Rates
 							</Text>
-							<View className='flex-row gap-3 mb-4'>
-								<View className='flex-1'>
-									<FormInput
-										label='Min Pages'
-										value={newDiscount.minPages}
-										onChangeText={(text) =>
-											handleNewDiscountChange('minPages', text)
-										}
-										placeholder='10'
-										keyboardType='numeric'
-									/>
+							<Text
+								className={`text-base font-medium ${themed.text.text} mb-6`}>
+								Offer discounts based on page count
+							</Text>
+
+							{/* Existing Discount Rates */}
+							{profile.discountRates.length > 0 && (
+								<View className='mb-6'>
+									<Text
+										className={`text-sm font-semibold ${themed.text.text} mb-3`}>
+										Current Discounts
+									</Text>
+									{profile.discountRates.map((discount, index) => (
+										<View
+											key={index}
+											className={`${themed.bg.background} border-2 ${themed.border.primary} rounded-xl p-4 mb-3 flex-row justify-between items-center`}>
+											<View className='flex-1'>
+												<Text
+													className={`text-base font-medium ${themed.text.text}`}>
+													{discount.minPages}-{discount.maxPages} pages
+												</Text>
+												<Text className={`text-sm ${themed.text.secondary}`}>
+													{discount.discount}% discount
+												</Text>
+											</View>
+											<TouchableOpacity
+												onPress={() => removeDiscountRate(index)}
+												className='bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg shadow-sm'>
+												<Text className='text-white text-sm font-medium'>
+													Remove
+												</Text>
+											</TouchableOpacity>
+										</View>
+									))}
 								</View>
-								<View className='flex-1'>
-									<FormInput
-										label='Max Pages'
-										value={newDiscount.maxPages}
-										onChangeText={(text) =>
-											handleNewDiscountChange('maxPages', text)
-										}
-										placeholder='50'
-										keyboardType='numeric'
-									/>
+							)}
+
+							{/* Add New Discount Rate */}
+							<View
+								className={`${themed.bg.background} border-2 border-dashed ${themed.border.primary} rounded-xl p-5`}>
+								<Text
+									className={`text-sm font-semibold ${themed.text.text} mb-4`}>
+									Add New Discount Rate
+								</Text>
+								<View className='flex-row gap-3 mb-4'>
+									<View className='flex-1'>
+										<FormInput
+											label='Min Pages'
+											value={newDiscount.minPages}
+											onChangeText={(text) =>
+												handleNewDiscountChange('minPages', text)
+											}
+											placeholder='10'
+											keyboardType='numeric'
+										/>
+									</View>
+									<View className='flex-1'>
+										<FormInput
+											label='Max Pages'
+											value={newDiscount.maxPages}
+											onChangeText={(text) =>
+												handleNewDiscountChange('maxPages', text)
+											}
+											placeholder='50'
+											keyboardType='numeric'
+										/>
+									</View>
+									<View className='flex-1'>
+										<FormInput
+											label='Discount %'
+											value={newDiscount.discount}
+											onChangeText={(text) =>
+												handleNewDiscountChange('discount', text)
+											}
+											placeholder='10'
+											keyboardType='numeric'
+										/>
+									</View>
 								</View>
-								<View className='flex-1'>
-									<FormInput
-										label='Discount %'
-										value={newDiscount.discount}
-										onChangeText={(text) =>
-											handleNewDiscountChange('discount', text)
-										}
-										placeholder='10'
-										keyboardType='numeric'
-									/>
-								</View>
+								<TouchableOpacity
+									onPress={addDiscountRate}
+									className={`${themed.bg.secondary} hover:${themed.bg.primary} px-6 py-3 rounded-xl flex-row items-center justify-center shadow-sm`}>
+									<Text className='text-white font-semibold mr-2'>+</Text>
+									<Text className='text-white font-semibold'>Add Discount</Text>
+								</TouchableOpacity>
 							</View>
-							<TouchableOpacity
-								onPress={addDiscountRate}
-								className={`${themed.bg.secondary} hover:${themed.bg.primary} px-6 py-3 rounded-xl flex-row items-center justify-center shadow-sm`}>
-								<Text className='text-white font-semibold mr-2'>+</Text>
-								<Text className='text-white font-semibold'>Add Discount</Text>
-							</TouchableOpacity>
+						</View>
+						{/* Additional Information Section */}
+						<View
+							className={`${themed.bg.card} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.card}`}>
+							<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
+								Additional Information
+							</Text>
+							<Text
+								className={`text-base font-medium ${themed.text.text} mb-6`}>
+								Any extra details about your service
+							</Text>
+
+							<FormInput
+								label='Additional Information'
+								value={profile.additionalInfo}
+								onChangeText={(text) => handleChange('additionalInfo', text)}
+								placeholder='Any additional details about your service (e.g., special offers, terms, contact hours)'
+								multiline={true}
+								numberOfLines={4}
+								maxLength={500}
+							/>
+						</View>
+						{/* Submit Button */}
+						<View className='pb-6'>
+							<AuthButton
+								title='Update Profile'
+								onPress={handleSubmit}
+								loading={loading}
+								size='large'
+							/>
 						</View>
 					</View>
-					{/* Additional Information Section */}
-					<View
-						className={`${themed.bg.card} rounded-2xl p-6 mb-8 shadow-sm border ${themed.border.card}`}>
-						<Text className={`text-2xl font-bold ${themed.text.text} mb-1`}>
-							Additional Information
-						</Text>
-						<Text className={`text-base font-medium ${themed.text.text} mb-6`}>
-							Any extra details about your service
-						</Text>
-
-						<FormInput
-							label='Additional Information'
-							value={profile.additionalInfo}
-							onChangeText={(text) => handleChange('additionalInfo', text)}
-							placeholder='Any additional details about your service (e.g., special offers, terms, contact hours)'
-							multiline={true}
-							numberOfLines={4}
-							maxLength={500}
-						/>
-					</View>
-					{/* Submit Button */}
-					<View className='pb-6'>
-						<AuthButton
-							title='Update Profile'
-							onPress={handleSubmit}
-							loading={loading}
-							size='large'
-						/>
-					</View>
-				</View>
-			</ScrollView>
-		</KeyboardAvoidingView>
+				</ScrollView>
+			</KeyboardAwareScrollView>
+			<KeyboardToolbar />
+		</>
 	);
 };
 
