@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../../hooks/useTheme';
+import useTheme from '../../hooks/useTheme';
 
 interface AuthInputProps {
 	label: string;
@@ -14,7 +14,7 @@ interface AuthInputProps {
 	disabled?: boolean;
 }
 
-export const AuthInput: React.FC<AuthInputProps> = ({
+const AuthInput: React.FC<AuthInputProps> = ({
 	label,
 	value,
 	onChangeText,
@@ -81,3 +81,5 @@ export const AuthInput: React.FC<AuthInputProps> = ({
 		</View>
 	);
 };
+
+export default AuthInput;

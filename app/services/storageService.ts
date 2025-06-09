@@ -2,114 +2,122 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../types/auth';
 
 const STORAGE_KEYS = {
-  TOKEN: '@uploaddoc_token',
-  USER: '@uploaddoc_user',
-  REMEMBER_EMAIL: '@uploaddoc_remember_email',
+	TOKEN: '@uploaddoc_token',
+	USER: '@uploaddoc_user',
+	REMEMBER_EMAIL: '@uploaddoc_remember_email',
 } as const;
 
-export class StorageService {
-  // Token management
-  static async saveToken(token: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
-    } catch (error) {
-      console.error('Error saving token:', error);
-      throw new Error('Failed to save authentication token');
-    }
-  }
+const StorageService = {
+	// Token management
+	saveToken: async function (token: string): Promise<void> {
+		try {
+			await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+		} catch (error) {
+			console.error('Error saving token:', error);
+			throw new Error('Failed to save authentication token');
+		}
+	},
 
-  static async getToken(): Promise<string | null> {
-    try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
-    } catch (error) {
-      console.error('Error getting token:', error);
-      return null;
-    }
-  }
+	getToken: async function (): Promise<string | null> {
+		try {
+			return await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
+		} catch (error) {
+			console.error('Error getting token:', error);
+			throw new Error('Failed to retrieve authentication token');
+		}
+	},
 
-  static async removeToken(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
-    } catch (error) {
-      console.error('Error removing token:', error);
-    }
-  }
+	removeToken: async function (): Promise<void> {
+		try {
+			await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
+		} catch (error) {
+			console.error('Error removing token:', error);
+			throw new Error('Failed to remove authentication token');
+		}
+	},
 
-  // User data management
-  static async saveUser(user: User): Promise<void> {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-    } catch (error) {
-      console.error('Error saving user:', error);
-      throw new Error('Failed to save user data');
-    }
-  }
+	// User management
+	saveUser: async function (user: User): Promise<void> {
+		try {
+			await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+		} catch (error) {
+			console.error('Error saving user:', error);
+			throw new Error('Failed to save user data');
+		}
+	},
 
-  static async getUser(): Promise<User | null> {
-    try {
-      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-      return userData ? JSON.parse(userData) : null;
-    } catch (error) {
-      console.error('Error getting user:', error);
-      return null;
-    }
-  }
+	getUser: async function (): Promise<User | null> {
+		try {
+			const userString = await AsyncStorage.getItem(STORAGE_KEYS.USER);
+			return userString ? JSON.parse(userString) : null;
+		} catch (error) {
+			console.error('Error getting user:', error);
+			throw new Error('Failed to retrieve user data');
+		}
+	},
 
-  static async removeUser(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.USER);
-    } catch (error) {
-      console.error('Error removing user:', error);
-    }
-  }
+	removeUser: async function (): Promise<void> {
+		try {
+			await AsyncStorage.removeItem(STORAGE_KEYS.USER);
+		} catch (error) {
+			console.error('Error removing user:', error);
+			throw new Error('Failed to remove user data');
+		}
+	},
 
-  // Remember email for login
-  static async saveRememberedEmail(email: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.REMEMBER_EMAIL, email);
-    } catch (error) {
-      console.error('Error saving remembered email:', error);
-    }
-  }
+	// Remember email functionality
+	saveRememberedEmail: async function (email: string): Promise<void> {
+		try {
+			await AsyncStorage.setItem(STORAGE_KEYS.REMEMBER_EMAIL, email);
+		} catch (error) {
+			console.error('Error saving remembered email:', error);
+			throw new Error('Failed to save remembered email');
+		}
+	},
 
-  static async getRememberedEmail(): Promise<string | null> {
-    try {
-      return await AsyncStorage.getItem(STORAGE_KEYS.REMEMBER_EMAIL);
-    } catch (error) {
-      console.error('Error getting remembered email:', error);
-      return null;
-    }
-  }
+	getRememberedEmail: async function (): Promise<string | null> {
+		try {
+			return await AsyncStorage.getItem(STORAGE_KEYS.REMEMBER_EMAIL);
+		} catch (error) {
+			console.error('Error getting remembered email:', error);
+			throw new Error('Failed to retrieve remembered email');
+		}
+	},
 
-  static async removeRememberedEmail(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.REMEMBER_EMAIL);
-    } catch (error) {
-      console.error('Error removing remembered email:', error);
-    }
-  }
+	removeRememberedEmail: async function (): Promise<void> {
+		try {
+			await AsyncStorage.removeItem(STORAGE_KEYS.REMEMBER_EMAIL);
+		} catch (error) {
+			console.error('Error removing remembered email:', error);
+			throw new Error('Failed to remove remembered email');
+		}
+	},
 
-  // Clear all auth data
-  static async clearAuthData(): Promise<void> {
-    try {
-      await Promise.all([
-        AsyncStorage.removeItem(STORAGE_KEYS.TOKEN),
-        AsyncStorage.removeItem(STORAGE_KEYS.USER),
-      ]);
-    } catch (error) {
-      console.error('Error clearing auth data:', error);
-    }
-  }
+	// Helper functions
+	clearAuthData: async function (): Promise<void> {
+		try {
+			await Promise.all([
+				AsyncStorage.removeItem(STORAGE_KEYS.TOKEN),
+				AsyncStorage.removeItem(STORAGE_KEYS.USER),
+			]);
+		} catch (error) {
+			console.error('Error clearing auth data:', error);
+			throw new Error('Failed to clear authentication data');
+		}
+	},
 
-  // Check if user data exists
-  static async hasAuthData(): Promise<boolean> {
-    try {
-      const token = await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
-      const user = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-      return !!(token && user);
-    } catch (error) {
-      console.error('Error checking auth data:', error);
-      return false;
-    }
-  }
-}
+	hasAuthData: async function (): Promise<boolean> {
+		try {
+			const [token, user] = await Promise.all([
+				AsyncStorage.getItem(STORAGE_KEYS.TOKEN),
+				AsyncStorage.getItem(STORAGE_KEYS.USER),
+			]);
+			return !!(token && user);
+		} catch (error) {
+			console.error('Error checking auth data:', error);
+			throw new Error('Failed to check authentication data');
+		}
+	},
+};
+
+export default StorageService;

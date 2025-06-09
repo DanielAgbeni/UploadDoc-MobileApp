@@ -1,7 +1,7 @@
 // hooks/useTheme.ts
 import { useTheme as useThemeContext } from '../context/ThemeContext';
 
-export const useTheme = () => {
+const useTheme = () => {
 	const context = useThemeContext();
 
 	const getThemedClassName = (
@@ -119,3 +119,5 @@ export const useTheme = () => {
 		themed,
 	};
 };
+
+export default useTheme;

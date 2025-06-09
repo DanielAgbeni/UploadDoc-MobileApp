@@ -142,3 +142,4 @@ class AuthServiceClass {
 }
 
 export const AuthService = new AuthServiceClass();
+export default AuthService;

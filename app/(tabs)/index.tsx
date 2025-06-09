@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { icons } from '../../constants/icons';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
-import { DashboardService } from '../services/dashboardService';
+import useTheme from '../hooks/useTheme';
+import DashboardService from '../services/dashboardService';
 import { DocumentService } from '../services/documentService';
 import { Project } from '../types/auth';
 

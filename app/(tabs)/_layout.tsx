@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useAuth } from '../context/AuthContext';
 import { useTab } from '../context/TabContext';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 
 const TabIcon = ({ focused, icons, title }: any) => {
 	const { themed, colors } = useTheme(); // Access both 'themed' (for classes) and 'colors' (for direct values)

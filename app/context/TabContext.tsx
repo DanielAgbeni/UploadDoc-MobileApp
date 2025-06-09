@@ -42,3 +42,5 @@ export const TabProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useTab = () => useContext(TabContext);
+
+export default TabProvider;

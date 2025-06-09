@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { TabProvider } from './context/TabContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './globals.css';
-import { useTheme } from './hooks/useTheme';
+import useTheme from './hooks/useTheme';
 
 function RootLayoutNav() {
 	const { isAuthenticated, isLoading } = useAuth();

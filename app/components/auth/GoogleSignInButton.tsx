@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Alert, Image, Text, TouchableOpacity } from 'react-native';
 import { icons } from '../../../constants/icons';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../hooks/useTheme';
-import { AuthService } from '../../services/authService';
-import { StorageService } from '../../services/storageService';
+import useTheme from '../../hooks/useTheme';
+import AuthService from '../../services/authService';
+import StorageService from '../../services/storageService';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,7 +14,7 @@ interface GoogleSignInButtonProps {
 	onError?: (error: string) => void;
 }
 
-export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
+const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 	onSuccess,
 	onError,
 }) => {
@@ -90,3 +90,5 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 		</TouchableOpacity>
 	);
 };
+
+export default GoogleSignInButton;

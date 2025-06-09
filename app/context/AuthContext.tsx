@@ -6,7 +6,7 @@ import React, {
 	useReducer,
 } from 'react';
 import { AuthService } from '../services/authService';
-import { StorageService } from '../services/storageService';
+import StorageService from '../services/storageService';
 import {
 	ApiError,
 	AuthState,
@@ -71,11 +71,9 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-	children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
 	const [state, dispatch] = useReducer(authReducer, initialState);
 	const [error, setError] = React.useState<string | null>(null);
 
@@ -233,10 +231,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
 	const context = useContext(AuthContext);
 	if (context === undefined) {
 		throw new Error('useAuth must be used within an AuthProvider');
 	}
 	return context;
 };
+
+export default AuthProvider;

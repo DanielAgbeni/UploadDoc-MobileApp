@@ -14,8 +14,8 @@ import { ApiError, ProjectPaginationResponse } from '../types/auth';
 
 const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
-class DashboardServiceClass {
-	private async makeRequest<T>(
+const DashboardService = {
+	makeRequest: async function <T>(
 		endpoint: string,
 		options: RequestInit = {},
 		token?: string,
@@ -47,9 +47,9 @@ class DashboardServiceClass {
 			}
 			throw error;
 		}
-	}
+	},
 
-	async getProject(
+	getProject: async function (
 		adminId: string,
 		page: number = 1,
 		limit: number = 10,
@@ -65,9 +65,9 @@ class DashboardServiceClass {
 			{ method: 'GET' },
 			token,
 		);
-	}
+	},
 
-	async acceptProject(
+	acceptProject: async function (
 		projectId: string,
 		token: string,
 	): Promise<{
@@ -82,9 +82,9 @@ class DashboardServiceClass {
 			},
 			token,
 		);
-	}
+	},
 
-	async deleteProject(
+	deleteProject: async function (
 		projectId: string,
 		token: string,
 	): Promise<{ message: string }> {
@@ -95,7 +95,7 @@ class DashboardServiceClass {
 			},
 			token,
 		);
-	}
-}
+	},
+};
 
-export const DashboardService = new DashboardServiceClass();
+export default DashboardService;

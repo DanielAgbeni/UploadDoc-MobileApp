@@ -18,7 +18,7 @@ const getBaseUrl = () => {
 const BASE_URL = getBaseUrl();
 
 class ProfileServiceClass {
-	private async makeRequest<T>(
+	async makeRequest<T>(
 		endpoint: string,
 		options: RequestInit = {},
 		token?: string,
@@ -75,4 +75,7 @@ class ProfileServiceClass {
 	}
 }
 
-export const ProfileService = new ProfileServiceClass();
+const ProfileService = new ProfileServiceClass();
+
+export { ProfileService };
+export default ProfileService;

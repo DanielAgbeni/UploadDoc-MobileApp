@@ -16,7 +16,7 @@ import { AdminPaginationResponse, ApiError } from '../types/auth'; // Import the
 const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class AdminServiceClass {
-	private async makeRequest<T>(
+	async makeRequest<T>(
 		endpoint: string,
 		options: RequestInit = {},
 		token?: string,
@@ -73,3 +73,4 @@ class AdminServiceClass {
 }
 
 export const AdminService = new AdminServiceClass();
+export default AdminService;

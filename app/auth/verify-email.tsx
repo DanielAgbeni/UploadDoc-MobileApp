@@ -11,10 +11,10 @@ import {
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
-import { AuthButton } from '../components/auth/AuthButton';
-import { AuthInput } from '../components/auth/AuthInput';
+import AuthButton from '../components/auth/AuthButton';
+import AuthInput from '../components/auth/AuthInput';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 import { ApiError } from '../types/auth';
 
 export default function VerifyEmailScreen() {

@@ -30,8 +30,8 @@ import {
 import { icons } from '../../constants/icons';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
-import { DashboardService } from '../services/dashboardService';
+import useTheme from '../hooks/useTheme';
+import DashboardService from '../services/dashboardService';
 import { Project } from '../types/auth';
 
 const Dashboard = () => {

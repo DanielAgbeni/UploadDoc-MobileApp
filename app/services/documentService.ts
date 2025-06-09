@@ -117,3 +117,4 @@ class DocumentServiceClass {
 }
 
 export const DocumentService = new DocumentServiceClass();
+export default DocumentService;

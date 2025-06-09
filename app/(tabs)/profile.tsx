@@ -11,9 +11,9 @@ import {
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
-import { AuthButton } from '../components/auth/AuthButton';
+import AuthButton from '../components/auth/AuthButton';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 
 const Profile = () => {
 	const { themed } = useTheme();

@@ -88,11 +88,9 @@ const darkColors: ThemeColors = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-interface ThemeProviderProps {
-	children: ReactNode;
-}
-
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
+	children,
+}) => {
 	const systemColorScheme = useColorScheme();
 	const colorScheme: ColorScheme =
 		systemColorScheme === 'dark' ? 'dark' : 'light';
@@ -110,10 +108,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 	);
 };
 
-export const useTheme = (): ThemeContextType => {
+export const useTheme = () => {
 	const context = useContext(ThemeContext);
 	if (context === undefined) {
 		throw new Error('useTheme must be used within a ThemeProvider');
 	}
 	return context;
 };
+
+export default ThemeProvider;

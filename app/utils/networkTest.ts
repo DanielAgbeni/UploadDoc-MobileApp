@@ -64,3 +64,8 @@ export const testBackendConnection = async (): Promise<{
 export const getCurrentBackendUrl = (): string => {
 	return getBaseUrl();
 };
+
+export default {
+	testBackendConnection,
+	getBaseUrl,
+};
