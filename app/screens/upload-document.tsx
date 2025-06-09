@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { icons } from '../../constants/icons';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 import { AdminService } from '../services/adminService';
 import { DocumentService } from '../services/documentService';
 import { Admin } from '../types/auth';

@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import AdminCard from '../components/AdminCard';
 import Pagination from '../components/Pagination';
-import { useTheme } from '../hooks/useTheme';
-import { AdminService } from '../services/adminService';
+import useTheme from '../hooks/useTheme';
+import AdminService from '../services/adminService';
 import { Admin } from '../types/auth';
 
 const ExploreScreen = () => {

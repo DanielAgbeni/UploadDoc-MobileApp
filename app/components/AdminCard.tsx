@@ -2,7 +2,7 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 import { Admin } from '../types/auth';
 
 const AdminCard = ({ admin }: { admin: Admin }) => {

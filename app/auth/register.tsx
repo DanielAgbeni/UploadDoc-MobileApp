@@ -11,11 +11,10 @@ import {
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
-import { AuthButton } from '../components/auth/AuthButton';
-import { AuthInput } from '../components/auth/AuthInput';
-import { GoogleSignInButton } from '../components/auth/GoogleSignInButton';
+import AuthButton from '../components/auth/AuthButton';
+import AuthInput from '../components/auth/AuthInput';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../hooks/useTheme';
+import useTheme from '../hooks/useTheme';
 import { ApiError } from '../types/auth';
 
 export default function RegisterScreen() {
@@ -251,7 +250,7 @@ export default function RegisterScreen() {
 					</View>
 
 					{/* Google Sign In */}
-					<GoogleSignInButton onError={handleGoogleError} />
+					{/* <GoogleSignInButton onError={handleGoogleError} /> */}
 
 					{/* Footer Links */}
 					<View className='mt-8 items-center'>
