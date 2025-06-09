@@ -149,14 +149,14 @@ const EditProfile = () => {
 		setProfile((prev) => ({ ...prev, [field]: value }));
 	};
 
-	const handleOpeningHoursChange = (hours: string) => {
-		setProfile((prev) => ({
-			...prev,
-			openingHours: hours,
-			// Clear custom hours if selecting a preset
-			customOpeningHours: hours === 'Custom' ? prev.customOpeningHours : '',
-		}));
-	};
+	// const handleOpeningHoursChange = (hours: string) => {
+	// 	setProfile((prev) => ({
+	// 		...prev,
+	// 		openingHours: hours,
+	// 		// Clear custom hours if selecting a preset
+	// 		customOpeningHours: hours === 'Custom' ? prev.customOpeningHours : '',
+	// 	}));
+	// };
 
 	const handleNewDiscountChange = (field: string, value: string) => {
 		setNewDiscount({ ...newDiscount, [field]: value });

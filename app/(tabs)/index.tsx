@@ -24,7 +24,6 @@ const HomeScreen = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
 
 	const defaultFontClass = 'font-inter';
 
@@ -41,7 +40,6 @@ const HomeScreen = () => {
 					token,
 				);
 				setDocuments(response.projects);
-				setTotalPages(response.pagination.totalPages);
 			} catch (err) {
 				console.error('Error fetching documents:', err);
 			} finally {

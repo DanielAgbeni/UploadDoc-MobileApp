@@ -247,7 +247,7 @@ export default function LoginScreen() {
 
 						<View className='flex-row items-center'>
 							<Text className={`text-base ${themed.text.text}`}>
-								Don't have an account?{' '}
+								Don&apos;t have an account?{' '}
 							</Text>
 							<Link
 								href='/auth/register'

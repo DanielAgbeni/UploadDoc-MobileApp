@@ -150,7 +150,7 @@ export default function VerifyEmailScreen() {
 						</Text>
 						<Text
 							className={`text-base font-medium text-center mb-4 ${themed.text.text}`}>
-							We've sent a 6-digit verification code to
+							We&apos;ve sent a 6-digit verification code to
 						</Text>
 						<Text
 							className={`text-xl font-medium text-center ${themed.text.primary}`}>
@@ -195,7 +195,7 @@ export default function VerifyEmailScreen() {
 					{/* Resend Code */}
 					<View className='items-center mb-8'>
 						<Text className={`text-lg font-medium mb-4 ${themed.text.text}`}>
-							Didn't receive the code?
+							Didn&apos;t receive the code?
 						</Text>
 
 						<TouchableOpacity

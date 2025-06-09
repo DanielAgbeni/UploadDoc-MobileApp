@@ -44,8 +44,8 @@ const TabIcon = ({ focused, icons, title }: any) => {
 	);
 };
 
-const _layout = () => {
-	const { colors, themed } = useTheme(); // Get both 'colors' (for direct values) and 'themed' (for classes)
+const Layout = () => {
+	const { colors } = useTheme(); // Get both 'colors' (for direct values) and 'themed' (for classes)
 	const { user } = useAuth();
 	const { lastActiveTab, setLastActiveTab } = useTab();
 
@@ -143,4 +143,4 @@ const _layout = () => {
 	);
 };
 
-export default _layout;
+export default Layout;

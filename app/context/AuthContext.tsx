@@ -200,6 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					setUser(response.user, token);
 				} catch (error) {
 					// Token is invalid, clear storage
+					console.log(error);
 					await StorageService.clearAuthData();
 					dispatch({ type: 'LOGOUT' });
 				}

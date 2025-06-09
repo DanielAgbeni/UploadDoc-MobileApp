@@ -54,6 +54,8 @@ const Profile = () => {
 						await logout();
 						router.replace('/auth/login');
 					} catch (error) {
+						console.log(error);
+
 						Alert.alert(
 							'Logout Error',
 							'Failed to sign out. Please try again.',

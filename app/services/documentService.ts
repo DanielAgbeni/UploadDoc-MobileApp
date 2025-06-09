@@ -45,6 +45,7 @@ class DocumentServiceClass {
 				// Then parse it as JSON
 				data = JSON.parse(responseText);
 			} catch (parseError) {
+				console.log(parseError);
 				throw {
 					message: 'Invalid response from server. Please try again.',
 					details: responseText.substring(0, 100), // Log first 100 chars of response

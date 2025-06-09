@@ -216,7 +216,9 @@ const Dashboard = () => {
 													data: downloadResult.uri,
 												},
 											);
-										} catch (scanError) {}
+										} catch (scanError) {
+											console.log('Error scanning file:', scanError);
+										}
 									}
 
 									// Give user options after download
