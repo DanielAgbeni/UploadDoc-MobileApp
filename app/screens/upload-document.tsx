@@ -3,7 +3,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	Image,
 	ScrollView,
 	Text,
@@ -12,6 +11,7 @@ import {
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
+import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
 import useTheme from '../hooks/useTheme';
 import { AdminService } from '../services/adminService';
@@ -31,6 +31,22 @@ export default function UploadDocumentScreen() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
 
+	// Add modal state
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalConfig, setModalConfig] = useState<{
+		title: string;
+		message: string;
+		buttons: Array<{
+			text: string;
+			onPress: () => void;
+			variant?: 'primary' | 'secondary' | 'danger';
+		}>;
+	}>({
+		title: '',
+		message: '',
+		buttons: [{ text: 'OK', onPress: () => {}, variant: 'primary' }],
+	});
+
 	const defaultFontClass = 'font-inter';
 
 	useEffect(() => {
@@ -42,18 +58,37 @@ export default function UploadDocumentScreen() {
 					if (response.admins && response.admins.length > 0) {
 						setSelectedAdmin(response.admins[0]);
 					} else {
-						Alert.alert('Error', 'Provider not found.');
+						setModalConfig({
+							title: 'Error',
+							message: 'Provider not found.',
+							buttons: [
+								{
+									text: 'OK',
+									onPress: () => setModalVisible(false),
+									variant: 'danger',
+								},
+							],
+						});
+						setModalVisible(true);
 					}
 				})
 				.catch((error) => {
-					Alert.alert('Error', 'Failed to load pre-selected provider.');
+					setModalConfig({
+						title: 'Error',
+						message: 'Failed to load pre-selected provider.',
+						buttons: [
+							{
+								text: 'OK',
+								onPress: () => setModalVisible(false),
+								variant: 'danger',
+							},
+						],
+					});
+					setModalVisible(true);
 				})
 				.finally(() => {
 					setIsLoading(false);
 				});
-		} else {
-			Alert.alert('Error', 'Missing required data.');
-			setIsLoading(false);
 		}
 	}, [selectedAdminId, token]);
 
@@ -76,16 +111,36 @@ export default function UploadDocumentScreen() {
 			}
 		} catch (error) {
 			console.error('Error picking document:', error);
-			Alert.alert('Error', 'Failed to pick document. Please try again.');
+			setModalConfig({
+				title: 'Error',
+				message: 'Failed to pick document. Please try again.',
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => setModalVisible(false),
+						variant: 'danger',
+					},
+				],
+			});
+			setModalVisible(true);
 		}
 	};
 
 	const uploadDocument = async () => {
 		if (!document || !title.trim() || !selectedAdmin || !user || !token) {
-			Alert.alert(
-				'Missing Info',
-				'Please fill in all fields and select a document/provider to upload.',
-			);
+			setModalConfig({
+				title: 'Missing Info',
+				message:
+					'Please fill in all fields and select a document/provider to upload.',
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => setModalVisible(false),
+						variant: 'danger',
+					},
+				],
+			});
+			setModalVisible(true);
 			return;
 		}
 
@@ -110,20 +165,41 @@ export default function UploadDocumentScreen() {
 
 			await DocumentService.uploadDocument(formData, token);
 
-			Alert.alert('Success', 'Document uploaded successfully', [
-				{ text: 'OK', onPress: () => router.back() },
-			]);
+			setModalConfig({
+				title: 'Success',
+				message: 'Document uploaded successfully',
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => {
+							setModalVisible(false);
+							router.back();
+						},
+						variant: 'primary',
+					},
+				],
+			});
+			setModalVisible(true);
 		} catch (error: any) {
 			console.error(
 				'Upload error:',
 				error.response?.data || error.message || error,
 			);
-			Alert.alert(
-				'Upload Failed',
-				error.response?.data?.message ||
+			setModalConfig({
+				title: 'Upload Failed',
+				message:
+					error.response?.data?.message ||
 					error.message ||
 					'Failed to upload document. Please try again.',
-			);
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => setModalVisible(false),
+						variant: 'danger',
+					},
+				],
+			});
+			setModalVisible(true);
 		} finally {
 			setIsLoading(false);
 		}
@@ -133,36 +209,82 @@ export default function UploadDocumentScreen() {
 		async (query: string) => {
 			if (!token) return;
 			if (query.trim() === '') {
-				Alert.alert(
-					'Search Empty',
-					'Please enter a provider name or ID to search.',
-				);
+				setModalConfig({
+					title: 'Search Empty',
+					message: 'Please enter a provider name or ID to search.',
+					buttons: [
+						{
+							text: 'OK',
+							onPress: () => setModalVisible(false),
+							variant: 'danger',
+						},
+					],
+				});
+				setModalVisible(true);
 				return;
 			}
 			setIsLoading(true);
 			try {
 				const response = await AdminService.getAdmins(1, 5, query);
 				if (response.admins.length === 0) {
-					Alert.alert(
-						'No Providers Found',
-						'No providers matched your search. Try a different term.',
-					);
+					setModalConfig({
+						title: 'No Providers Found',
+						message: 'No providers matched your search. Try a different term.',
+						buttons: [
+							{
+								text: 'OK',
+								onPress: () => setModalVisible(false),
+								variant: 'danger',
+							},
+						],
+					});
+					setModalVisible(true);
 				} else {
-					// Store all matched admins
 					setAdminResults(response.admins);
 				}
 			} catch (error: any) {
 				console.error('Error searching admins:', error);
-				Alert.alert(
-					'Search Error',
-					error.message || 'Failed to search for providers.',
-				);
+				setModalConfig({
+					title: 'Search Error',
+					message: error.message || 'Failed to search for providers.',
+					buttons: [
+						{
+							text: 'OK',
+							onPress: () => setModalVisible(false),
+							variant: 'danger',
+						},
+					],
+				});
+				setModalVisible(true);
 			} finally {
 				setIsLoading(false);
 			}
 		},
 		[token],
 	);
+
+	const handleRemoveAdmin = () => {
+		setModalConfig({
+			title: 'Remove Provider',
+			message: 'Are you sure you want to remove this provider?',
+			buttons: [
+				{
+					text: 'Cancel',
+					onPress: () => setModalVisible(false),
+					variant: 'secondary',
+				},
+				{
+					text: 'Remove',
+					onPress: () => {
+						setSelectedAdmin(null);
+						setModalVisible(false);
+					},
+					variant: 'danger',
+				},
+			],
+		});
+		setModalVisible(true);
+	};
 
 	return (
 		<ScrollView
@@ -210,15 +332,26 @@ export default function UploadDocumentScreen() {
 						</Text>
 
 						{selectedAdmin && (
-							<View
-								className={`p-5 rounded-xl border-2 mb-3 shadow-sm ${themed.bg.card} ${themed.border.card}`}>
-								<Text className={`font-medium text-lg ${themed.text.text}`}>
-									{selectedAdmin.name}
-								</Text>
-								<Text
-									className={`${themed.text['card-detail']} mt-1 ${defaultFontClass}`}>
-									📍 {selectedAdmin.printingLocation || 'No location provided'}
-								</Text>
+							<View className='mb-3'>
+								<View
+									className={`p-5 rounded-xl border-2 shadow-sm ${themed.bg.card} ${themed.border.card}`}>
+									<Text className={`font-medium text-lg ${themed.text.text}`}>
+										{selectedAdmin.name}
+									</Text>
+									<Text
+										className={`${themed.text['card-detail']} mt-1 ${defaultFontClass}`}>
+										📍{' '}
+										{selectedAdmin.printingLocation || 'No location provided'}
+									</Text>
+								</View>
+								<TouchableOpacity
+									onPress={handleRemoveAdmin}
+									className={`mt-2 p-3 rounded-lg ${themed.bg['button-delete']}`}>
+									<Text
+										className={`text-center font-medium ${themed.text['on-button-delete']}`}>
+										Remove Provider
+									</Text>
+								</TouchableOpacity>
 							</View>
 						)}
 						{!selectedAdmin && (
@@ -306,6 +439,15 @@ export default function UploadDocumentScreen() {
 					</TouchableOpacity>
 				</View>
 			</View>
+
+			{/* Modal Component */}
+			<Modal
+				visible={modalVisible}
+				onClose={() => setModalVisible(false)}
+				title={modalConfig.title}
+				message={modalConfig.message}
+				buttons={modalConfig.buttons}
+			/>
 		</ScrollView>
 	);
 }

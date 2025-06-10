@@ -1,10 +1,5 @@
 import * as FileSystem from 'expo-file-system';
-import * as IntentLauncher from 'expo-intent-launcher';
-import {
-	PermissionStatus,
-	getPermissionsAsync,
-	requestPermissionsAsync,
-} from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
 import React, {
 	useCallback,
@@ -15,19 +10,18 @@ import React, {
 } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	FlatList,
 	Image,
 	Linking,
 	Platform,
 	RefreshControl,
-	Share,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
+import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../context/AuthContext';
 import useTheme from '../hooks/useTheme';
@@ -35,7 +29,7 @@ import DashboardService from '../services/dashboardService';
 import { Project } from '../types/auth';
 
 const Dashboard = () => {
-	const { themed, colors } = useTheme(); // Access both 'themed' (for classes) and 'colors' (for direct values)
+	const { themed, colors } = useTheme();
 	const { user, token } = useAuth();
 	const [projects, setProjects] = useState<Project[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -43,8 +37,26 @@ const Dashboard = () => {
 	const [error, setError] = useState('');
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(1);
-	const [searchQuery, setSearchQuery] = useState(''); // New: search query state
-	const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null); // New: debounce ref
+	const [searchQuery, setSearchQuery] = useState('');
+	const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	type ButtonVariant = 'primary' | 'secondary' | 'danger';
+
+	// Add modal state
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalConfig, setModalConfig] = useState<{
+		title: string;
+		message: string;
+		buttons: Array<{
+			text: string;
+			onPress: () => void;
+			variant?: ButtonVariant;
+		}>;
+	}>({
+		title: '',
+		message: '',
+		buttons: [{ text: 'OK', onPress: () => {}, variant: 'primary' }],
+	});
 
 	const fetchProjects = async (pageNum = page) => {
 		if (!user?._id || !token) {
@@ -118,10 +130,32 @@ const Dashboard = () => {
 		try {
 			setLoading(true);
 			await DashboardService.acceptProject(projectId, token);
-			Alert.alert('Success', 'Project accepted successfully');
+			setModalConfig({
+				title: 'Success',
+				message: 'Project accepted successfully',
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => setModalVisible(false),
+						variant: 'primary',
+					},
+				],
+			});
+			setModalVisible(true);
 			await fetchProjects(page);
 		} catch (err: any) {
-			Alert.alert('Error', err.message || 'Failed to accept project');
+			setModalConfig({
+				title: 'Error',
+				message: err.message || 'Failed to accept project',
+				buttons: [
+					{
+						text: 'OK',
+						onPress: () => setModalVisible(false),
+						variant: 'danger',
+					},
+				],
+			});
+			setModalVisible(true);
 		} finally {
 			setLoading(false);
 		}
@@ -130,192 +164,294 @@ const Dashboard = () => {
 	const handleDeleteProject = async (projectId: string) => {
 		if (!token) return;
 
-		Alert.alert(
-			'Confirm Delete',
-			'Are you sure you want to delete this project?',
-			[
-				{ text: 'Cancel', style: 'cancel' },
+		setModalConfig({
+			title: 'Confirm Delete',
+			message: 'Are you sure you want to delete this project?',
+			buttons: [
+				{
+					text: 'Cancel',
+					onPress: () => setModalVisible(false),
+					variant: 'secondary',
+				},
 				{
 					text: 'Delete',
-					style: 'destructive',
 					onPress: async () => {
+						setModalVisible(false);
 						try {
 							setLoading(true);
 							await DashboardService.deleteProject(projectId, token);
-							Alert.alert('Success', 'Project deleted successfully');
+							setModalConfig({
+								title: 'Success',
+								message: 'Project deleted successfully',
+								buttons: [
+									{
+										text: 'OK',
+										onPress: () => setModalVisible(false),
+										variant: 'primary',
+									},
+								],
+							});
+							setModalVisible(true);
 							await fetchProjects(page);
 						} catch (err: any) {
-							Alert.alert('Error', err.message || 'Failed to delete project');
+							setModalConfig({
+								title: 'Error',
+								message: err.message || 'Failed to delete project',
+								buttons: [
+									{
+										text: 'OK',
+										onPress: () => setModalVisible(false),
+										variant: 'danger',
+									},
+								],
+							});
+							setModalVisible(true);
 						} finally {
 							setLoading(false);
 						}
 					},
+					variant: 'danger',
 				},
 			],
-		);
+		});
+		setModalVisible(true);
 	};
 
 	const handleDownload = async (fileUrl: string, fileName: string) => {
 		try {
-			Alert.alert(
-				'Download PDF',
-				'Choose how to open this document:',
-				[
-					{
-						text: 'Download to Device',
-						onPress: async () => {
-							try {
-								// Check and request permissions for Android
-								if (Platform.OS === 'android') {
-									const { status } = await getPermissionsAsync();
-									if (status !== PermissionStatus.GRANTED) {
-										const { status: newStatus } =
-											await requestPermissionsAsync();
-										if (newStatus !== PermissionStatus.GRANTED) {
-											Alert.alert(
-												'Permission required',
-												'Please grant storage permissions to download files.',
-											);
-											return;
-										}
-									}
-								}
-
-								// Ensure the filename has a .pdf extension
-								const formattedFileName = fileName.endsWith('.pdf')
-									? fileName
-									: `${fileName}.pdf`;
-								const downloadPath = `${FileSystem.documentDirectory}${formattedFileName}`;
-
-								// Show downloading alert
-								Alert.alert(
-									'Downloading',
-									'Please wait while the file is being downloaded...',
-								);
-
-								const downloadResumable = FileSystem.createDownloadResumable(
-									fileUrl,
-									downloadPath,
-									{},
-									(downloadProgress) => {
-										const progress =
-											downloadProgress.totalBytesWritten /
-											downloadProgress.totalBytesExpectedToWrite;
-										console.log(`Download progress: ${progress * 100}%`);
-									},
-								);
-
-								const downloadResult = await downloadResumable.downloadAsync();
-
-								if (downloadResult && downloadResult.uri) {
-									// For Android, we need to explicitly make the file visible in the gallery/media store
-									if (Platform.OS === 'android') {
-										try {
-											await IntentLauncher.startActivityAsync(
-												'android.intent.action.MEDIA_SCANNER_SCAN_FILE',
-												{
-													data: downloadResult.uri,
-												},
-											);
-										} catch (scanError) {
-											console.log('Error scanning file:', scanError);
-										}
-									}
-
-									// Give user options after download
-									Alert.alert(
-										'Download Complete',
-										'File has been saved successfully.',
-										[
-											{
-												text: 'Open File',
-												onPress: async () => {
-													try {
-														if (await Sharing.isAvailableAsync()) {
-															await Sharing.shareAsync(downloadResult.uri, {
-																mimeType: 'application/pdf',
-																dialogTitle: `Open ${formattedFileName}`,
-															});
-														} else {
-															await Linking.openURL(
-																`file://${downloadResult.uri}`,
-															);
-														}
-													} catch (openError) {
-														console.error('Error opening file:', openError);
-														Alert.alert(
-															'Error',
-															'No application available to open PDF files.',
-														);
-													}
-												},
-											},
-											{
-												text: 'OK',
-												style: 'cancel',
-											},
-										],
-									);
-								} else {
-									throw new Error('Download failed - no URI returned');
-								}
-							} catch (downloadError) {
-								console.error('Download error:', downloadError);
-								Alert.alert(
-									'Download Failed',
-									'Could not download the file. Please check your internet connection and try again.',
-								);
-							}
-						},
-					},
+			setModalConfig({
+				title: 'Download PDF',
+				message: 'Choose how to open this document:',
+				buttons: [
+					// {
+					// 	text: 'Download to Device',
+					// 	onPress: async () => {
+					// 		setModalVisible(false);
+					// 		await downloadToDevice(fileUrl, fileName);
+					// 	},
+					// 	variant: 'primary',
+					// },
 					{
 						text: 'Open in Browser',
 						onPress: async () => {
-							try {
-								const supported = await Linking.canOpenURL(fileUrl);
-								if (supported) {
-									await Linking.openURL(fileUrl);
-								} else {
-									Alert.alert(
-										'Error',
-										'Unable to open this file. Please check if you have a web browser installed.',
-									);
-								}
-							} catch (browserError) {
-								console.error('Browser open error:', browserError);
-								Alert.alert('Error', 'Failed to open the file in browser');
-							}
+							setModalVisible(false);
+							await openInBrowser(fileUrl);
 						},
-					},
-					{
-						text: 'Share',
-						onPress: async () => {
-							try {
-								await Share.share({
-									url: fileUrl,
-									title: fileName,
-									message: `Check out this document: ${fileName}`,
-								});
-							} catch (shareError) {
-								console.error('Share error:', shareError);
-								Alert.alert('Error', 'Failed to share the file');
-							}
-						},
+						variant: 'secondary',
 					},
 					{
 						text: 'Cancel',
-						style: 'cancel',
+						onPress: () => setModalVisible(false),
+						variant: 'secondary',
 					},
 				],
-				{ cancelable: true },
-			);
+			});
+			setModalVisible(true);
 		} catch (error) {
 			console.error('Unexpected error:', error);
-			Alert.alert(
-				'Error',
-				'An unexpected error occurred while processing the file',
+			showErrorModal('An unexpected error occurred while processing the file');
+		}
+	};
+
+	const downloadToDevice = async (fileUrl: string, fileName: string) => {
+		try {
+			// Request permissions first
+			const hasPermission = await requestPermissions();
+			if (!hasPermission) {
+				return;
+			}
+
+			// Show downloading modal
+			showDownloadingModal();
+
+			// Ensure filename has .pdf extension
+			const formattedFileName = fileName.endsWith('.pdf')
+				? fileName
+				: `${fileName}.pdf`;
+
+			let downloadPath: string;
+			let finalPath: string;
+
+			if (Platform.OS === 'android') {
+				// For Android, download to cache first, then move to Downloads
+				downloadPath = `${FileSystem.cacheDirectory}${formattedFileName}`;
+			} else {
+				// For iOS, use document directory
+				downloadPath = `${FileSystem.documentDirectory}${formattedFileName}`;
+			}
+
+			// Download the file
+			const downloadResumable = FileSystem.createDownloadResumable(
+				fileUrl,
+				downloadPath,
+				{},
+				(downloadProgress) => {
+					const progress =
+						downloadProgress.totalBytesWritten /
+						downloadProgress.totalBytesExpectedToWrite;
+					console.log(`Download progress: ${(progress * 100).toFixed(2)}%`);
+				},
+			);
+
+			const downloadResult = await downloadResumable.downloadAsync();
+
+			if (!downloadResult?.uri) {
+				throw new Error('Download failed - no URI returned');
+			}
+
+			if (Platform.OS === 'android') {
+				// Move file to Downloads folder using MediaLibrary
+				const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
+				const album = await MediaLibrary.getAlbumAsync('Downloads');
+
+				if (album) {
+					await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+				} else {
+					// Create Downloads album if it doesn't exist
+					await MediaLibrary.createAlbumAsync('Downloads', asset, false);
+				}
+
+				finalPath = asset.uri;
+
+				// Clean up temporary file
+				try {
+					await FileSystem.deleteAsync(downloadResult.uri);
+				} catch (cleanupError) {
+					console.log('Cleanup error:', cleanupError);
+				}
+			} else {
+				finalPath = downloadResult.uri;
+			}
+
+			// Show success modal with options
+			showSuccessModal(finalPath, formattedFileName);
+		} catch (error) {
+			console.error('Download error:', error);
+			showErrorModal(
+				'Could not download the file. Please check your internet connection and try again.',
 			);
 		}
+	};
+
+	const requestPermissions = async (): Promise<boolean> => {
+		try {
+			if (Platform.OS === 'android') {
+				// Request media library permissions for Android
+				const { status } = await MediaLibrary.requestPermissionsAsync();
+
+				if (status !== 'granted') {
+					setModalConfig({
+						title: 'Permission Required',
+						message:
+							'Please grant media library permissions to save files to Downloads folder.',
+						buttons: [
+							{
+								text: 'OK',
+								onPress: () => setModalVisible(false),
+								variant: 'primary',
+							},
+						],
+					});
+					setModalVisible(true);
+					return false;
+				}
+			}
+			return true;
+		} catch (error) {
+			console.error('Permission request error:', error);
+			showErrorModal('Failed to request permissions');
+			return false;
+		}
+	};
+
+	const openInBrowser = async (fileUrl: string) => {
+		try {
+			const supported = await Linking.canOpenURL(fileUrl);
+			if (supported) {
+				await Linking.openURL(fileUrl);
+			} else {
+				showErrorModal(
+					'Unable to open this file. Please check if you have a web browser installed.',
+				);
+			}
+		} catch (error) {
+			console.error('Browser open error:', error);
+			showErrorModal('Failed to open the file in browser');
+		}
+	};
+
+	const showDownloadingModal = () => {
+		setModalConfig({
+			title: 'Downloading',
+			message: 'Please wait while the file is being downloaded...',
+			buttons: [
+				{
+					text: 'OK',
+					onPress: () => setModalVisible(false),
+					variant: 'primary',
+				},
+			],
+		});
+		setModalVisible(true);
+	};
+
+	const showSuccessModal = (filePath: string, fileName: string) => {
+		const message =
+			Platform.OS === 'android'
+				? 'File has been saved to Downloads folder successfully.'
+				: 'File has been saved successfully.';
+
+		setModalConfig({
+			title: 'Download Complete',
+			message,
+			buttons: [
+				{
+					text: 'Open File',
+					onPress: async () => {
+						setModalVisible(false);
+						await openFile(filePath, fileName);
+					},
+					variant: 'primary',
+				},
+				{
+					text: 'Close',
+					onPress: () => setModalVisible(false),
+					variant: 'secondary',
+				},
+			],
+		});
+		setModalVisible(true);
+	};
+
+	const openFile = async (filePath: string, fileName: string) => {
+		try {
+			if (await Sharing.isAvailableAsync()) {
+				await Sharing.shareAsync(filePath, {
+					mimeType: 'application/pdf',
+					dialogTitle: `Open ${fileName}`,
+				});
+			} else {
+				await Linking.openURL(`file://${filePath}`);
+			}
+		} catch (error) {
+			console.error('Error opening file:', error);
+			showErrorModal('No application available to open PDF files.');
+		}
+	};
+
+	const showErrorModal = (message: string) => {
+		setModalConfig({
+			title: 'Error',
+			message,
+			buttons: [
+				{
+					text: 'OK',
+					onPress: () => setModalVisible(false),
+					variant: 'primary',
+				},
+			],
+		});
+		setModalVisible(true);
 	};
 
 	// Define a default font class to apply to all text components
@@ -593,6 +729,15 @@ const Dashboard = () => {
 					onPageChange={handlePageChange}
 				/>
 			)}
+
+			{/* Modal Component */}
+			<Modal
+				visible={modalVisible}
+				onClose={() => setModalVisible(false)}
+				title={modalConfig.title}
+				message={modalConfig.message}
+				buttons={modalConfig.buttons}
+			/>
 		</View>
 	);
 };

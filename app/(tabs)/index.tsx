@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	FlatList,
 	Image,
 	RefreshControl,
@@ -11,11 +10,13 @@ import {
 	View,
 } from 'react-native';
 import { icons } from '../../constants/icons';
+import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
 import useTheme from '../hooks/useTheme';
+import AdminService from '../services/adminService';
 import DashboardService from '../services/dashboardService';
 import { DocumentService } from '../services/documentService';
-import { Project } from '../types/auth';
+import { Admin, Project } from '../types/auth';
 
 const HomeScreen = () => {
 	const { themed, colors } = useTheme();
@@ -24,6 +25,30 @@ const HomeScreen = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [page, setPage] = useState(1);
+
+	const [adminResults, setAdminResults] = useState<Admin[]>([]);
+
+	const getAdminName = (adminId: string | undefined) => {
+		if (!adminId) return 'Unassigned';
+		const admin = adminResults?.find((admin) => admin._id === adminId);
+		return admin ? admin.name : 'Unknown Admin';
+	};
+
+	// Add modal state
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalConfig, setModalConfig] = useState<{
+		title: string;
+		message: string;
+		buttons: Array<{
+			text: string;
+			onPress: () => void;
+			variant?: 'primary' | 'secondary' | 'danger';
+		}>;
+	}>({
+		title: '',
+		message: '',
+		buttons: [{ text: 'OK', onPress: () => {}, variant: 'primary' }],
+	});
 
 	const defaultFontClass = 'font-inter';
 
@@ -39,6 +64,30 @@ const HomeScreen = () => {
 					10,
 					token,
 				);
+
+				// Fetch admin data for all documents
+				const adminIds = [
+					...new Set(
+						response.projects
+							.map((project) => project.assignedAdmin)
+							.filter(Boolean),
+					),
+				];
+				console.log('Admin IDs:', adminIds);
+				if (adminIds.length > 0) {
+					try {
+						// Fetch all admins in one request with a larger limit
+						const adminResponse = await AdminService.getAdmins(1, 50);
+						const admins = adminResponse.admins.filter((admin) =>
+							adminIds.includes(admin._id),
+						);
+						console.log('Fetched admins:', admins);
+						setAdminResults(admins);
+					} catch (error) {
+						console.error('Error fetching admin data:', error);
+					}
+				}
+
 				setDocuments(response.projects);
 			} catch (err) {
 				console.error('Error fetching documents:', err);
@@ -57,29 +106,57 @@ const HomeScreen = () => {
 	const handleDeleteProject = async (projectId: string) => {
 		if (!token) return;
 
-		Alert.alert(
-			'Confirm Delete',
-			'Are you sure you want to delete this project?',
-			[
-				{ text: 'Cancel', style: 'cancel' },
+		setModalConfig({
+			title: 'Confirm Delete',
+			message: 'Are you sure you want to delete this project?',
+			buttons: [
+				{
+					text: 'Cancel',
+					onPress: () => setModalVisible(false),
+					variant: 'secondary',
+				},
 				{
 					text: 'Delete',
-					style: 'destructive',
 					onPress: async () => {
+						setModalVisible(false);
 						try {
 							setIsLoading(true);
 							await DashboardService.deleteProject(projectId, token);
-							Alert.alert('Success', 'Project deleted successfully');
+							setModalConfig({
+								title: 'Success',
+								message: 'Project deleted successfully',
+								buttons: [
+									{
+										text: 'OK',
+										onPress: () => setModalVisible(false),
+										variant: 'primary',
+									},
+								],
+							});
+							setModalVisible(true);
 							await fetchDocuments(page);
 						} catch (err: any) {
-							Alert.alert('Error', err.message || 'Failed to delete project');
+							setModalConfig({
+								title: 'Error',
+								message: err.message || 'Failed to delete project',
+								buttons: [
+									{
+										text: 'OK',
+										onPress: () => setModalVisible(false),
+										variant: 'danger',
+									},
+								],
+							});
+							setModalVisible(true);
 						} finally {
 							setIsLoading(false);
 						}
 					},
+					variant: 'danger',
 				},
 			],
-		);
+		});
+		setModalVisible(true);
 	};
 
 	const handleRefresh = useCallback(() => {
@@ -111,7 +188,7 @@ const HomeScreen = () => {
 					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
 					numberOfLines={1}
 					ellipsizeMode='tail'>
-					Student: {item.studentName}
+					Provider: {getAdminName(item.assignedAdmin)}
 				</Text>
 				<Text
 					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
@@ -315,6 +392,15 @@ const HomeScreen = () => {
 					/>
 				)}
 			</View>
+
+			{/* Modal Component */}
+			<Modal
+				visible={modalVisible}
+				onClose={() => setModalVisible(false)}
+				title={modalConfig.title}
+				message={modalConfig.message}
+				buttons={modalConfig.buttons}
+			/>
 		</View>
 	);
 };
