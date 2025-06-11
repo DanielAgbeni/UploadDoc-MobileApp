@@ -73,7 +73,7 @@ const HomeScreen = () => {
 							.filter(Boolean),
 					),
 				];
-				console.log('Admin IDs:', adminIds);
+
 				if (adminIds.length > 0) {
 					try {
 						// Fetch all admins in one request with a larger limit
@@ -81,7 +81,7 @@ const HomeScreen = () => {
 						const admins = adminResponse.admins.filter((admin) =>
 							adminIds.includes(admin._id),
 						);
-						console.log('Fetched admins:', admins);
+
 						setAdminResults(admins);
 					} catch (error) {
 						console.error('Error fetching admin data:', error);
@@ -188,7 +188,7 @@ const HomeScreen = () => {
 					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
 					numberOfLines={1}
 					ellipsizeMode='tail'>
-					Provider: {getAdminName(item.assignedAdmin)}
+					Submitted to: {getAdminName(item.assignedAdmin)}
 				</Text>
 				<Text
 					className={`text-base font-medium ${themed.text.text} ${defaultFontClass}`}
@@ -233,8 +233,8 @@ const HomeScreen = () => {
 							item.status === 'accepted'
 								? 'bg-green-500'
 								: item.status === 'pending'
-								? 'bg-yellow-500'
-								: 'bg-red-500'
+									? 'bg-yellow-500'
+									: 'bg-red-500'
 						}`}>
 						<Text
 							className={`text-white text-sm capitalize ${defaultFontClass}`}

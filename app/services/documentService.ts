@@ -62,7 +62,7 @@ class DocumentServiceClass {
 
 			if (error instanceof TypeError) {
 				throw {
-					message: `Network error. Cannot connect to server at ${BASE_URL}. Please check your connection.`,
+					message: `Network error. Please check your connection and ensure you are connected to the internet`,
 				} as ApiError;
 			}
 

@@ -43,7 +43,7 @@ class AdminServiceClass {
 
 			if (error instanceof TypeError) {
 				throw {
-					message: `Network error. Cannot connect to server at ${BASE_URL}. Please check your connection and ensure the backend server is running.`,
+					message: `Network error. Please check your connection and ensure you are connected to the internet`,
 				} as ApiError;
 			}
 			throw error;

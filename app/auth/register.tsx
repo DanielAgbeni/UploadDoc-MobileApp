@@ -1,6 +1,7 @@
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import {
+	Alert,
 	Image,
 	KeyboardAvoidingView,
 	Platform,
@@ -12,7 +13,7 @@ import {
 import { icons } from '../../constants/icons';
 import AuthButton from '../components/auth/AuthButton';
 import AuthInput from '../components/auth/AuthInput';
-import Modal from '../components/Modal';
+import GoogleSignInButton from '../components/auth/GoogleSignInButton';
 import { useAuth } from '../context/AuthContext';
 import useTheme from '../hooks/useTheme';
 import { ApiError } from '../types/auth';
@@ -30,20 +31,6 @@ export default function RegisterScreen() {
 	});
 	const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 	const [acceptTerms, setAcceptTerms] = useState(false);
-	const [modalVisible, setModalVisible] = useState(false);
-	const [modalConfig, setModalConfig] = useState<{
-		title: string;
-		message: string;
-		buttons: {
-			text: string;
-			onPress: () => void;
-			variant: 'primary' | 'danger';
-		}[];
-	}>({
-		title: '',
-		message: '',
-		buttons: [{ text: 'OK', onPress: () => {}, variant: 'primary' }],
-	});
 
 	const validateForm = () => {
 		const errors: { [key: string]: string } = {};
@@ -99,41 +86,26 @@ export default function RegisterScreen() {
 				password: formData.password,
 			});
 
-			setModalConfig({
-				title: 'Registration Successful',
-				message: response.message,
-				buttons: [
-					{
-						text: 'OK',
-						onPress: () => {
-							router.push({
-								pathname: '/auth/verify-email',
-								params: { email: formData.email.trim().toLowerCase() },
-							});
-						},
-						variant: 'primary',
+			// Show success message and redirect to verification
+			Alert.alert('Registration Successful', response.message, [
+				{
+					text: 'OK',
+					onPress: () => {
+						router.push({
+							pathname: '/auth/verify-email',
+							params: { email: formData.email.trim().toLowerCase() },
+						});
 					},
-				],
-			});
-			setModalVisible(true);
+				},
+			]);
 		} catch (error) {
 			const apiError = error as ApiError;
-			setModalConfig({
-				title: 'Registration Failed',
-				message: apiError.message,
-				buttons: [{ text: 'OK', onPress: () => {}, variant: 'danger' }],
-			});
-			setModalVisible(true);
+			Alert.alert('Registration Failed', apiError.message);
 		}
 	};
 
 	const handleGoogleError = (errorMessage: string) => {
-		setModalConfig({
-			title: 'Google Sign-in Failed',
-			message: errorMessage,
-			buttons: [{ text: 'OK', onPress: () => {}, variant: 'danger' }],
-		});
-		setModalVisible(true);
+		Alert.alert('Google Sign-in Failed', errorMessage);
 	};
 
 	return (
@@ -279,7 +251,7 @@ export default function RegisterScreen() {
 					</View>
 
 					{/* Google Sign In */}
-					{/* <GoogleSignInButton onError={handleGoogleError} /> */}
+					<GoogleSignInButton onError={handleGoogleError} />
 
 					{/* Footer Links */}
 					<View className='mt-8 items-center'>
@@ -301,15 +273,6 @@ export default function RegisterScreen() {
 					</View>
 				</View>
 			</ScrollView>
-
-			{/* Modal Component */}
-			<Modal
-				visible={modalVisible}
-				onClose={() => setModalVisible(false)}
-				title={modalConfig.title}
-				message={modalConfig.message}
-				buttons={modalConfig.buttons}
-			/>
 		</KeyboardAvoidingView>
 	);
 }

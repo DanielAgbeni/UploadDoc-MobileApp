@@ -1,6 +1,7 @@
+import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
-import React, { useState } from 'react';
-import { Alert, Image, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Text, TouchableOpacity } from 'react-native';
 import { icons } from '../../../constants/icons';
 import { useAuth } from '../../context/AuthContext';
 import useTheme from '../../hooks/useTheme';
@@ -22,47 +23,64 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 	const { checkAuthStatus } = useAuth();
 	const [loading, setLoading] = useState(false);
 
-	const handleGoogleSignIn = async () => {
+	const [request, response, promptAsync] = Google.useAuthRequest({
+		androidClientId:
+			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+		iosClientId:
+			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+		webClientId:
+			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+		clientId:
+			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+		responseType: 'id_token',
+		scopes: ['profile', 'email'],
+	});
+
+	useEffect(() => {
+		if (response?.type === 'success') {
+			handleSignInResponse(response.authentication?.accessToken);
+		}
+	}, [response]);
+
+	const handleSignInResponse = async (accessToken?: string | null) => {
+		if (!accessToken) {
+			onError?.('No access token received');
+			return;
+		}
+
 		try {
 			setLoading(true);
+			// Send the access token to your backend
+			const userResponse = await AuthService.googleSignIn(accessToken);
 
-			// For now, we'll use WebBrowser to open the Google auth URL
-			// In a production app, you'd want to implement proper OAuth flow
-			const authUrl = AuthService.getGoogleAuthUrl();
+			if (userResponse.token) {
+				// Save to storage
+				await StorageService.saveToken(userResponse.token);
+				await StorageService.saveUser(userResponse.user);
 
-			const result = await WebBrowser.openAuthSessionAsync(
-				authUrl,
-				'uploaddocmobile://google-auth-callback',
-			);
-
-			if (result.type === 'success' && result.url) {
-				// Extract token from callback URL
-				const url = new URL(result.url);
-				const token = url.searchParams.get('token');
-
-				if (token) {
-					// Verify the token and get user data
-					const userResponse = await AuthService.checkUserStatus(token);
-
-					// Save to storage
-					await StorageService.saveToken(token);
-					await StorageService.saveUser(userResponse.user);
-
-					// Update auth context
-					await checkAuthStatus();
-
-					onSuccess?.();
-				} else {
-					throw new Error('No token received from Google authentication');
-				}
-			} else if (result.type === 'cancel') {
+				// Update auth context
+				await checkAuthStatus();
+				onSuccess?.();
 			}
 		} catch (error) {
 			console.error('Google sign-in error:', error);
 			const errorMessage =
 				error instanceof Error ? error.message : 'Google sign-in failed';
 			onError?.(errorMessage);
-			Alert.alert('Sign-in Error', errorMessage);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleGoogleSignIn = async () => {
+		try {
+			setLoading(true);
+			await promptAsync();
+		} catch (error) {
+			console.error('Google sign-in error:', error);
+			const errorMessage =
+				error instanceof Error ? error.message : 'Google sign-in failed';
+			onError?.(errorMessage);
 		} finally {
 			setLoading(false);
 		}

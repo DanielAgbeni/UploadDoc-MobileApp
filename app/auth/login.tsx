@@ -241,11 +241,11 @@ export default function LoginScreen() {
 
 					{/* Footer Links */}
 					<View className='mt-8 items-center'>
-						<TouchableOpacity className='mb-4'>
+						{/* <TouchableOpacity className='mb-4'>
 							<Text className={`${themed.text.text} text-base font-medium`}>
 								Forgot Password?
 							</Text>
-						</TouchableOpacity>
+						</TouchableOpacity> */}
 
 						<View className='flex-row items-center'>
 							<Text className={`text-base ${themed.text.text}`}>
