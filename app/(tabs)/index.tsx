@@ -25,9 +25,15 @@ const HomeScreen = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [page, setPage] = useState(1);
-
 	const [adminResults, setAdminResults] = useState<Admin[]>([]);
+	const defaultFontClass = 'font-inter';
 
+	// Move navigation check to useEffect
+	useEffect(() => {
+		if (!user) {
+			router.replace('/auth/login');
+		}
+	}, [user]);
 	const getAdminName = (adminId: string | undefined) => {
 		if (!adminId) return 'Unassigned';
 		const admin = adminResults?.find((admin) => admin._id === adminId);
@@ -49,8 +55,6 @@ const HomeScreen = () => {
 		message: '',
 		buttons: [{ text: 'OK', onPress: () => {}, variant: 'primary' }],
 	});
-
-	const defaultFontClass = 'font-inter';
 
 	const fetchDocuments = useCallback(
 		async (pageNum: number) => {

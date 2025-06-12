@@ -295,6 +295,14 @@ const EditProfile = () => {
 							</View>
 						</View>
 					)}
+					<View className='mb-6 p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 shadow-sm'>
+						<View className='flex-row items-center'>
+							<View className='w-2 h-2 bg-yellow-500 rounded-full mr-3' />
+							<Text className='text-white font-medium flex-1'>
+								Not all settings are availabe on the app
+							</Text>
+						</View>
+					</View>
 					{/* Basic Information Section */}
 					<View
 						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
@@ -330,51 +338,6 @@ const EditProfile = () => {
 						</View>
 					</View>
 
-					{/* <View
-					className={`${themed.bg.background} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.primary}`}>
-					<Text className={`text-xl font-bold ${themed.text.text} mb-1`}>
-						Operating Hours
-					</Text>
-					<Text className={`text-sm ${themed.text.text} mb-6`}>
-						When customers can access your service
-					</Text>
-
-					<View className='flex-row flex-wrap gap-3 mb-4'>
-						{PRESET_OPENING_HOURS.map((hours) => (
-							<TouchableOpacity
-								key={hours}
-								onPress={() => handleOpeningHoursChange(hours)}
-								activeOpacity={0.7}
-								className={`px-4 py-3 rounded-xl border-2 ${
-									profile.openingHours === hours
-										? `${themed.bg.primary} border-transparent shadow-md`
-										: `${themed.bg.background} ${themed.border.primary}`
-								}`}>
-								<Text
-									className={`text-sm font-medium ${
-										profile.openingHours === hours
-											? 'text-white'
-											: themed.text.text
-									}`}>
-									{hours}
-								</Text>
-							</TouchableOpacity>
-						))}
-					</View>
-
-					{profile.openingHours === 'Custom' && (
-						<View className='mt-4'>
-							<FormInput
-								label='Custom Opening Hours'
-								value={profile.customOpeningHours}
-								onChangeText={(text) =>
-									handleChange('customOpeningHours', text)
-								}
-								placeholder='e.g., Mon-Fri: 8AM-6PM, Sat: 9AM-3PM'
-							/>
-						</View>
-					)}
-				</View> */}
 					{/* Discount Rates Section */}
 					<View
 						className={`${themed.bg.card} rounded-2xl p-6 mb-6 shadow-sm border ${themed.border.card}`}>
