@@ -25,31 +25,41 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 
 	const [request, response, promptAsync] = Google.useAuthRequest({
 		androidClientId:
-			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+			'111429529165-3irujao5mgtrimdnlo2vhturvefjhftk.apps.googleusercontent.com',
 		iosClientId:
-			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
+			'111429529165-3irujao5mgtrimdnlo2vhturvefjhftk.apps.googleusercontent.com',
 		webClientId:
-			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
-		clientId:
-			'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
-		responseType: 'id_token',
+			'111429529165-3irujao5mgtrimdnlo2vhturvefjhftk.apps.googleusercontent.com',
+		responseType: 'token', // Changed from 'id_token' to Token
 		scopes: ['profile', 'email'],
 	});
 
 	useEffect(() => {
-		if (response?.type === 'success') {
-			handleSignInResponse(response.authentication?.accessToken);
-		}
+		handleAuthResponse(); // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [response]);
 
-	const handleSignInResponse = async (accessToken?: string | null) => {
-		if (!accessToken) {
-			onError?.('No access token received');
-			return;
+	const handleAuthResponse = async () => {
+		if (response?.type === 'success') {
+			// Now we can access the accessToken properly
+			const { accessToken: access_token } = response.authentication || {};
+			if (access_token) {
+				await handleSignInWithToken(access_token);
+			} else {
+				onError?.('No access token received from Google');
+			}
+		} else if (response?.type === 'error') {
+			console.error('Google auth error:', response.error);
+			onError?.(response.error?.message || 'Google authentication failed');
+		} else if (response?.type === 'cancel') {
+			console.log('Google sign-in was cancelled');
+			onError?.('Google sign-in was cancelled');
 		}
+	};
 
+	const handleSignInWithToken = async (accessToken: string) => {
 		try {
 			setLoading(true);
+
 			// Send the access token to your backend
 			const userResponse = await AuthService.googleSignIn(accessToken);
 
@@ -61,6 +71,8 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 				// Update auth context
 				await checkAuthStatus();
 				onSuccess?.();
+			} else {
+				onError?.('Authentication successful but no token received');
 			}
 		} catch (error) {
 			console.error('Google sign-in error:', error);
@@ -73,15 +85,22 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 	};
 
 	const handleGoogleSignIn = async () => {
+		if (!request) {
+			onError?.('Google sign-in is not ready. Please try again.');
+			return;
+		}
+
 		try {
 			setLoading(true);
-			await promptAsync();
+			const result = await promptAsync();
+			// The result will be handled by the useEffect hook
 		} catch (error) {
-			console.error('Google sign-in error:', error);
+			console.error('Error initiating Google sign-in:', error);
 			const errorMessage =
-				error instanceof Error ? error.message : 'Google sign-in failed';
+				error instanceof Error
+					? error.message
+					: 'Failed to start Google sign-in';
 			onError?.(errorMessage);
-		} finally {
 			setLoading(false);
 		}
 	};
@@ -89,12 +108,12 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 	return (
 		<TouchableOpacity
 			onPress={handleGoogleSignIn}
-			disabled={loading}
+			disabled={loading || !request}
 			className={`
         w-full px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600
         flex-row items-center justify-center
         ${themed.bg.background}
-        ${loading ? 'opacity-50' : ''}
+        ${loading || !request ? 'opacity-50' : ''}
       `}
 			activeOpacity={0.8}>
 			<Image

@@ -7,25 +7,6 @@ import {
 	VerifyEmailRequest,
 } from '../types/auth';
 
-// Get the correct base URL for different environments
-// const getBaseUrl = () => {
-// 	// For development, use your machine's IP address
-// 	// You can find your IP by running: ipconfig (Windows) or ifconfig (Mac/Linux)
-// 	const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
-
-// 	if (__DEV__) {
-// 		// If running in development and we can get the debugger host
-// 		if (debuggerHost) {
-// 			return `http://${debuggerHost}:5000`;
-// 		}
-// 		// Fallback for development - using your machine's IP
-// 		return 'http://192.168.137.156:5000'; // Your machine's IP address
-// 	}
-
-// 	// For production, use your actual server URL
-// 	return 'https://your-production-api.com';
-// };
-
 const BASE_URL = 'https://upload-doc-backend.vercel.app';
 
 class AuthServiceClass {
@@ -141,7 +122,7 @@ class AuthServiceClass {
 	}
 
 	async googleSignIn(accessToken: string): Promise<AuthResponse> {
-		return this.makeRequest<AuthResponse>('/api/auth/google', {
+		return this.makeRequest<AuthResponse>('/api/auth/google/mobile', {
 			method: 'POST',
 			body: JSON.stringify({ accessToken }),
 		});

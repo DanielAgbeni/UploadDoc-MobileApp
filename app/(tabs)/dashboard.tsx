@@ -28,22 +28,6 @@ import useTheme from '../hooks/useTheme';
 import DashboardService from '../services/dashboardService';
 import { Project } from '../types/auth';
 
-// Utility function to extract file extension from URL (kept for reference, but the one inside component is used)
-// const getFileExtension = (url: string): string => {
-// 	try {
-// 		const urlObj = new URL(url);
-// 		const pathname = urlObj.pathname;
-// 		const lastDotIndex = pathname.lastIndexOf('.');
-// 		if (lastDotIndex !== -1 && lastDotIndex < pathname.length - 1) {
-// 			return pathname.slice(lastDotIndex).toLowerCase(); // e.g., .pdf, .docx
-// 		}
-// 		return '.bin'; // Fallback for unknown types
-// 	} catch (error) {
-// 		console.warn('Invalid URL, using default extension:', error);
-// 		return '.bin';
-// 	}
-// };
-
 const Dashboard = () => {
 	const { themed, colors } = useTheme();
 	const { user, token } = useAuth();
@@ -56,9 +40,6 @@ const Dashboard = () => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const [warning, setWarning] = useState(true);
-
-	// const [downloadedFiles, setDownloadedFiles] = useState<string[]>([]); // This state is not used in the provided logic
-	// const [showFilesModal, setShowFilesModal] = useState(false); // This state is not used in the provided logic
 
 	type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
@@ -80,6 +61,10 @@ const Dashboard = () => {
 
 	// NEW: State to hold the path of the last downloaded file for "View File" option
 	const [downloadedFilePath, setDownloadedFilePath] = useState<string | null>(
+		null,
+	);
+	// NEW: State to hold the original file name, useful for sharing dialog
+	const [downloadedFileName, setDownloadedFileName] = useState<string | null>(
 		null,
 	);
 
@@ -324,22 +309,18 @@ const Dashboard = () => {
 
 			// For non-media files (like PDFs), use the documents directory
 			const isMediaFile = /\.(jpg|jpeg|png|gif|mp4|mov)$/i.test(fileExtension);
-			const baseDir =
-				Platform.OS === 'android'
-					? `${FileSystem.documentDirectory}Download/`
-					: FileSystem.documentDirectory;
+			// Always download to documentDirectory first, as it's app-private and reliable
+			const baseDir = FileSystem.documentDirectory;
 
 			if (!baseDir) throw new Error('Could not determine download directory');
 
 			const downloadPath = `${baseDir}${finalFileName}`;
 			console.log('Starting download to:', downloadPath);
 
-			// Ensure download directory exists
-			if (Platform.OS === 'android') {
-				const dirInfo = await FileSystem.getInfoAsync(baseDir);
-				if (!dirInfo.exists) {
-					await FileSystem.makeDirectoryAsync(baseDir, { intermediates: true });
-				}
+			// Ensure directory exists (useful for subdirectories, though here it's just root of documentDirectory)
+			const dirInfo = await FileSystem.getInfoAsync(baseDir);
+			if (!dirInfo.exists) {
+				await FileSystem.makeDirectoryAsync(baseDir, { intermediates: true });
 			}
 
 			// Download the file
@@ -369,16 +350,24 @@ const Dashboard = () => {
 
 			console.log('Download completed to:', result.uri);
 
+			// If it's a media file on Android, we can also try to add it to the media library
+			// This makes it visible in gallery apps immediately, without requiring user to "Save to Phone" again.
 			if (Platform.OS === 'android' && isMediaFile) {
 				try {
 					const asset = await MediaLibrary.createAssetAsync(result.uri);
-					console.log('File saved to MediaLibrary:', asset);
+					console.log('File saved to MediaLibrary (for media types):', asset);
 				} catch (mediaError) {
-					console.warn('MediaLibrary save failed:', mediaError);
+					console.warn(
+						'MediaLibrary asset creation failed for media type:',
+						mediaError,
+					);
+					// This warning is fine if it still downloaded to app-private storage.
+					// The "Save to Phone" option will still work for the user.
 				}
 			}
 
 			setDownloadedFilePath(result.uri);
+			setDownloadedFileName(finalFileName); // Store the final file name
 			showSuccessModal();
 		} catch (error) {
 			console.error('Download error:', error);
@@ -410,6 +399,19 @@ const Dashboard = () => {
 			'.ppt': 'application/vnd.ms-powerpoint',
 			'.pptx':
 				'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+			'.zip': 'application/zip',
+			'.rar': 'application/x-rar-compressed',
+			'.csv': 'text/csv',
+			'.odt': 'application/vnd.oasis.opendocument.text',
+			'.rtf': 'application/rtf',
+			'.mov': 'video/quicktime',
+			'.mp4': 'video/mp4',
+			'.mp3': 'audio/mpeg',
+			'.avi': 'video/x-msvideo',
+			'.wav': 'audio/wav',
+			'.gif': 'image/gif',
+			'.bmp': 'image/bmp',
+			'.tiff': 'image/tiff',
 		};
 		return mimeTypes[extension] || 'application/octet-stream';
 	};
@@ -417,7 +419,8 @@ const Dashboard = () => {
 	const requestPermissions = async (): Promise<boolean> => {
 		try {
 			if (Platform.OS === 'android') {
-				// Request media library permissions which on Android covers storage access needed for MediaLibrary.createAssetAsync
+				// On Android, MediaLibrary permission also often covers write access needed for sharing/saving files
+				// especially when dealing with app-private files going to public directories via system dialogs.
 				const mediaLibraryPermission =
 					await MediaLibrary.requestPermissionsAsync();
 
@@ -434,6 +437,7 @@ const Dashboard = () => {
 				}
 			}
 			// For iOS, files downloaded to documentDirectory are generally accessible by the app
+			// and Sharing API usually doesn't require explicit app-level permissions for basic share sheet functionality.
 			return true;
 		} catch (error) {
 			console.error('Permission request error:', error);
@@ -447,44 +451,41 @@ const Dashboard = () => {
 		if (!downloadedFilePath) return;
 
 		try {
-			// Get file extension to determine handling
+			// Get file extension and mime type
 			const extension =
 				downloadedFilePath.split('.').pop()?.toLowerCase() || '';
 			const mimeType = getContentType(`.${extension}`);
 
-			if (Platform.OS === 'android') {
-				// For Android, we need to get a content URI that other apps can access
-				const contentUri =
-					await FileSystem.getContentUriAsync(downloadedFilePath);
-				console.log('Content URI:', contentUri);
-
-				// Try to open with a viewer app
-				const canOpen = await Linking.canOpenURL(contentUri);
-				if (canOpen) {
-					await Linking.openURL(contentUri);
-				} else {
-					// If no app can directly open it, try sharing
-					if (await Sharing.isAvailableAsync()) {
-						await Sharing.shareAsync(downloadedFilePath, {
-							mimeType,
-							dialogTitle: 'Open with...',
-						});
-					} else {
-						throw new Error('No application can view this file type');
-					}
-				}
+			if (await Sharing.isAvailableAsync()) {
+				// Use Sharing to open the file. This often provides more options (like "Open with...")
+				// than Linking.openURL for local files, especially for non-media types.
+				await Sharing.shareAsync(downloadedFilePath, {
+					mimeType,
+					// UTI is useful for iOS to hint at the file type, optional on Android
+					UTI: Platform.OS === 'ios' ? getUTIForMimeType(mimeType) : undefined,
+					dialogTitle: 'Open with...',
+				});
 			} else {
-				// For iOS, use the sharing sheet which handles both viewing and saving
-				if (await Sharing.isAvailableAsync()) {
-					await Sharing.shareAsync(downloadedFilePath, {
-						mimeType,
-						UTI: getUTIForMimeType(mimeType),
-						dialogTitle: 'Open with...',
-					});
+				// Fallback to Linking.openURL if Sharing is not available (less common)
+				// For Android, you often need to expose a content URI for other apps to access.
+				if (Platform.OS === 'android') {
+					const contentUri =
+						await FileSystem.getContentUriAsync(downloadedFilePath);
+					const canOpen = await Linking.canOpenURL(contentUri);
+					if (canOpen) {
+						await Linking.openURL(contentUri);
+					} else {
+						throw new Error(
+							'No application can view this file type directly via Linking.',
+						);
+					}
 				} else {
-					throw new Error('Sharing is not available');
+					throw new Error('Sharing is not available on this device.');
 				}
 			}
+			setModalVisible(false); // Close the modal after attempting to view
+			setDownloadedFilePath(null); // Clear path after action
+			setDownloadedFileName(null);
 		} catch (error) {
 			console.error('Error opening file:', error);
 			showErrorModal(
@@ -506,52 +507,49 @@ const Dashboard = () => {
 			'application/vnd.ms-excel': 'com.microsoft.excel.xls',
 			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
 				'org.openxmlformats.spreadsheetml.sheet',
+			'video/mp4': 'public.mpeg-4',
+			'video/quicktime': 'com.apple.quicktime-movie',
+			'audio/mpeg': 'public.mp3',
+			'application/zip': 'public.zip-archive',
+			'application/x-rar-compressed': 'com.rarlab.rar-archive',
+			'application/vnd.ms-powerpoint': 'com.microsoft.powerpoint.ppt',
+			'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+				'org.openxmlformats.presentationml.presentation',
+			'text/csv': 'public.comma-separated-values-text',
+			'application/rtf': 'public.rtf',
 		};
 		return utiMap[mimeType] || 'public.item';
 	};
 
 	const handleSaveToPhone = async () => {
-		if (downloadedFilePath) {
-			try {
-				if (Platform.OS === 'android') {
-					// For Android: Save to Downloads folder using MediaLibrary
-					const asset = await MediaLibrary.createAssetAsync(downloadedFilePath);
-					const album = await MediaLibrary.getAlbumAsync('Download');
-					if (album) {
-						await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
-					}
+		if (!downloadedFilePath) return;
 
-					setModalConfig({
-						title: 'Success',
-						message: 'File has been saved to your Downloads folder',
-						buttons: [
-							{
-								text: 'OK',
-								onPress: () => {
-									setModalVisible(false);
-									setDownloadedFilePath(null);
-								},
-								variant: 'primary' as ButtonVariant,
-							},
-						],
-					});
-					setModalVisible(true);
-				} else {
-					// For iOS: Use share sheet to save
-					await Sharing.shareAsync(downloadedFilePath, {
-						dialogTitle: 'Save File',
-						mimeType: 'application/octet-stream',
-						UTI: 'public.item',
-					});
-					setModalVisible(false);
-					setDownloadedFilePath(null);
-				}
-			} catch (error) {
-				console.error('Error saving file:', error);
-				showErrorModal(
-					'Could not save the file to your phone. Please try again.',
-				);
+		try {
+			if (!(await Sharing.isAvailableAsync())) {
+				showErrorModal('Sharing is not available on your device.');
+				return;
 			}
+
+			// Get file extension and mime type for proper sharing context
+			const extension =
+				downloadedFilePath.split('.').pop()?.toLowerCase() || '';
+			const mimeType = getContentType(`.${extension}`);
+
+			await Sharing.shareAsync(downloadedFilePath, {
+				mimeType: mimeType,
+				// UTI is only for iOS, helps the system understand the file type
+				UTI: Platform.OS === 'ios' ? getUTIForMimeType(mimeType) : undefined,
+				dialogTitle: 'Save File To...', // Custom title for the share dialog
+			});
+
+			setModalVisible(false);
+			setDownloadedFilePath(null);
+			setDownloadedFileName(null);
+		} catch (error) {
+			console.error('Error saving file via sharing:', error);
+			showErrorModal(
+				'Could not save the file to your phone. Please try again.',
+			);
 		}
 	};
 
@@ -567,7 +565,7 @@ const Dashboard = () => {
 				},
 				{
 					text: 'Save to Phone',
-					onPress: handleSaveToPhone,
+					onPress: handleSaveToPhone, // This now uses the new sharing logic
 					variant: 'secondary' as ButtonVariant,
 				},
 				{
@@ -575,6 +573,7 @@ const Dashboard = () => {
 					onPress: () => {
 						setModalVisible(false);
 						setDownloadedFilePath(null);
+						setDownloadedFileName(null);
 					},
 					variant: 'danger' as ButtonVariant,
 				},
@@ -593,6 +592,7 @@ const Dashboard = () => {
 					onPress: () => {
 						setModalVisible(false);
 						setDownloadedFilePath(null); // Clear path even on error
+						setDownloadedFileName(null);
 					},
 					variant: 'primary' as ButtonVariant,
 				},
