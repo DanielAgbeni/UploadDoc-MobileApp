@@ -27,11 +27,10 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 		// Configure Google Sign-In
 		GoogleSignin.configure({
 			webClientId:
-				'111429529165-sb7t0b8hdiroe47leb8ea2md215rp909.apps.googleusercontent.com',
-			iosClientId:
 				'111429529165-3irujao5mgtrimdnlo2vhturvefjhftk.apps.googleusercontent.com',
 			scopes: ['profile', 'email'],
-			offlineAccess: true, // if you need server-side access
+			offlineAccess: true,
+			forceCodeForRefreshToken: true,
 		});
 	}, []);
 
@@ -49,8 +48,6 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 
 			// Extract the data from the response
 			const { serverAuthCode } = response;
-
-			// Use serverAuthCode for backend authentication (matches your backend expectation)
 			if (serverAuthCode) {
 				await handleSignInWithCode(serverAuthCode);
 			} else {
