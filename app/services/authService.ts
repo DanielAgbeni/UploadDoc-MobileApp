@@ -121,10 +121,13 @@ class AuthServiceClass {
 		return `${BASE_URL}/api/auth/google`;
 	}
 
-	async googleSignIn(accessToken: string): Promise<AuthResponse> {
+	// Updated Google Sign-In method to send authorization code
+	async googleSignIn(serverAuthCode: string): Promise<AuthResponse> {
 		return this.makeRequest<AuthResponse>('/api/auth/google/mobile', {
 			method: 'POST',
-			body: JSON.stringify({ accessToken }),
+			body: JSON.stringify({
+				code: serverAuthCode, // Send as 'code' to match your backend expectation
+			}),
 		});
 	}
 }
